@@ -17,6 +17,19 @@ const RupiahIcon = ({ size = 18 }: { size?: number }) => (
 // Get today's date in YYYY-MM-DD format
 const getTodayDate = () => format(new Date(), 'yyyy-MM-dd');
 
+// Format number with thousand separators
+const formatWithThousandSeparator = (value: string): string => {
+  // Remove all non-digit characters
+  const numericValue = value.replace(/[^\d]/g, '');
+  // Add thousand separators
+  return numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+
+// Parse formatted number back to raw number
+const parseFormattedNumber = (value: string): number => {
+  return parseFloat(value.replace(/,/g, '')) || 0;
+};
+
 interface AddExpenseFormProps {
   onSubmit: (expense: ExpenseInsert) => Promise<void>;
   isMobile: boolean;
@@ -38,12 +51,12 @@ export function AddExpenseForm({ onSubmit, isMobile }: AddExpenseFormProps) {
   };
 
   const handleSubmit = async () => {
-    if (!amount || parseFloat(amount) <= 0) return;
+    if (!amount || parseFormattedNumber(amount) <= 0) return;
 
     setIsSubmitting(true);
     try {
       await onSubmit({
-        amount: parseFloat(amount),
+        amount: parseFormattedNumber(amount),
         category: selectedCategory.id,
         description: description || selectedCategory.name,
         expense_date: expenseDate,
@@ -63,10 +76,11 @@ export function AddExpenseForm({ onSubmit, isMobile }: AddExpenseFormProps) {
       <div>
         <label className="block text-sm font-medium text-neutral-600 mb-2">Amount (IDR)</label>
         <GlassInput
-          type="number"
+          type="text"
+          inputMode="numeric"
           placeholder="0"
           value={amount}
-          onChange={(e) => setAmount(e.target.value)}
+          onChange={(e) => setAmount(formatWithThousandSeparator(e.target.value))}
           icon={<RupiahIcon size={18} />}
           className="text-2xl font-semibold"
         />
@@ -127,7 +141,7 @@ export function AddExpenseForm({ onSubmit, isMobile }: AddExpenseFormProps) {
         variant="primary"
         fullWidth
         onClick={handleSubmit}
-        disabled={!amount || parseFloat(amount) <= 0 || isSubmitting}
+        disabled={!amount || parseFormattedNumber(amount) <= 0 || isSubmitting}
         className="py-4 text-lg mt-4"
       >
         {isSubmitting ? (
