@@ -3,13 +3,18 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Expense, ExpenseInsert } from '@/lib/types';
 import { createClient } from '@/utils/supabase/client';
-import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, format } from 'date-fns';
+import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, format, parseISO } from 'date-fns';
 import { getWeeklyLimitStatus, WEEKLY_LIMIT } from '@/lib/budget';
 
-export type FilterType = 'daily' | 'weekly' | 'monthly';
+export type FilterType = 'daily' | 'weekly' | 'monthly' | 'custom';
+
+export interface CustomDateRange {
+  start: string;
+  end: string;
+}
 
 // Helper to get date range based on filter type
-function getDateRange(filter: FilterType, now = new Date()) {
+function getDateRange(filter: Exclude<FilterType, 'custom'>, now = new Date()) {
   const ranges = {
     daily: { start: startOfDay(now), end: endOfDay(now) },
     weekly: { start: startOfWeek(now, { weekStartsOn: 1 }), end: endOfWeek(now, { weekStartsOn: 1 }) },
@@ -26,13 +31,29 @@ export function useExpenses() {
   const [weeklyExpenses, setWeeklyExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<FilterType>('daily');
+  const [customDateRange, setCustomDateRange] = useState<CustomDateRange | undefined>();
 
   const supabase = useMemo(() => createClient(), []);
 
   const fetchExpenses = useCallback(async () => {
     setLoading(true);
 
-    const { start, end } = getDateRange(filter);
+    let start: Date;
+    let end: Date;
+
+    if (filter === 'custom' && customDateRange) {
+      start = startOfDay(parseISO(customDateRange.start));
+      end = endOfDay(parseISO(customDateRange.end));
+    } else if (filter !== 'custom') {
+      const range = getDateRange(filter);
+      start = range.start;
+      end = range.end;
+    } else {
+      // Custom filter without date range - default to today
+      start = startOfDay(new Date());
+      end = endOfDay(new Date());
+    }
+
     const weeklyRange = getDateRange('weekly');
 
     try {
@@ -60,7 +81,7 @@ export function useExpenses() {
     } finally {
       setLoading(false);
     }
-  }, [filter, supabase]);
+  }, [filter, customDateRange, supabase]);
 
   const addExpense = useCallback(async (expense: ExpenseInsert) => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -107,6 +128,8 @@ export function useExpenses() {
     loading,
     filter,
     setFilter,
+    customDateRange,
+    setCustomDateRange,
     addExpense,
     deleteExpense,
     totalExpenses,

@@ -1,11 +1,13 @@
 import { Expense, ExpenseInsert } from '@/lib/types';
-import { FilterType } from '@/hooks/useExpenses';
+import { FilterType, CustomDateRange } from '@/hooks/useExpenses';
 
 export interface ViewProps {
   expenses: Expense[];
   loading: boolean;
   filter: FilterType;
   setFilter: (filter: FilterType) => void;
+  customDateRange?: CustomDateRange;
+  setCustomDateRange: (range: CustomDateRange) => void;
   totalExpenses: number;
   weeklyTotal: number;
   weeklyLimit: number;

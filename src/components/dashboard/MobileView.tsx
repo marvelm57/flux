@@ -18,6 +18,8 @@ export function MobileView({
   loading,
   filter,
   setFilter,
+  customDateRange,
+  setCustomDateRange,
   totalExpenses,
   weeklyTotal,
   weeklyLimit,
@@ -37,10 +39,11 @@ export function MobileView({
     router.push('/login');
   };
 
-  const filterLabels = {
+  const filterLabels: Record<string, string> = {
     daily: "Today's",
     weekly: "This Week's",
     monthly: "This Month's",
+    custom: "Custom",
   };
 
   return (
@@ -152,7 +155,13 @@ export function MobileView({
           className="mb-6"
         >
           <GlassCard variant="light" padding="sm" rounded="2xl">
-            <FilterTabs filter={filter} setFilter={setFilter} isMobile={true} />
+            <FilterTabs 
+              filter={filter} 
+              setFilter={setFilter} 
+              isMobile={true}
+              customDateRange={customDateRange}
+              onCustomDateChange={setCustomDateRange}
+            />
           </GlassCard>
         </motion.div>
 

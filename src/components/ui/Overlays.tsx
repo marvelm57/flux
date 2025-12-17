@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { ReactNode, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { GlassCard, GlassButton } from './GlassComponents';
 
 interface BottomSheetProps {
@@ -25,7 +26,10 @@ export function BottomSheet({ isOpen, onClose, children, title }: BottomSheetPro
     };
   }, [isOpen]);
 
-  return (
+  // Only render portal on client side
+  if (typeof window === 'undefined') return null;
+
+  const content = (
     <AnimatePresence>
       {isOpen && (
         <>
@@ -78,6 +82,8 @@ export function BottomSheet({ isOpen, onClose, children, title }: BottomSheetPro
       )}
     </AnimatePresence>
   );
+
+  return createPortal(content, document.body);
 }
 
 interface ModalProps {
@@ -99,7 +105,10 @@ export function Modal({ isOpen, onClose, children, title }: ModalProps) {
     };
   }, [isOpen]);
 
-  return (
+  // Only render portal on client side
+  if (typeof window === 'undefined') return null;
+
+  const content = (
     <AnimatePresence>
       {isOpen && (
         <>
@@ -136,4 +145,6 @@ export function Modal({ isOpen, onClose, children, title }: ModalProps) {
       )}
     </AnimatePresence>
   );
+
+  return createPortal(content, document.body);
 }

@@ -18,6 +18,8 @@ export function DesktopView({
   loading,
   filter,
   setFilter,
+  customDateRange,
+  setCustomDateRange,
   totalExpenses,
   weeklyTotal,
   weeklyLimit,
@@ -37,10 +39,11 @@ export function DesktopView({
     router.push('/login');
   };
 
-  const filterLabels = {
+  const filterLabels: Record<string, string> = {
     daily: "Today's",
     weekly: "This Week's",
     monthly: "This Month's",
+    custom: "Custom",
   };
 
   const statsCards = [
@@ -84,7 +87,13 @@ export function DesktopView({
           </div>
           
           <div className="flex items-center gap-4">
-            <FilterTabs filter={filter} setFilter={setFilter} isMobile={false} />
+            <FilterTabs 
+              filter={filter} 
+              setFilter={setFilter} 
+              isMobile={false}
+              customDateRange={customDateRange}
+              onCustomDateChange={setCustomDateRange}
+            />
             
             <button
               onClick={handleLogout}
