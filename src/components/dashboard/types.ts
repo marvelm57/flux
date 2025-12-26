@@ -20,6 +20,8 @@ export interface ViewProps {
   };
   expensesByCategory: Record<string, number>;
   expensesByDate: Record<string, number>;
+  dailyAverage: number;
+  numberOfDays: number;
   addExpense: (expense: ExpenseInsert) => Promise<void>;
   deleteExpense: (id: string) => Promise<void>;
 }

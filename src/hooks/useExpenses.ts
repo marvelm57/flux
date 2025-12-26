@@ -106,6 +106,21 @@ export function useExpenses() {
   const weeklyTotal = useMemo(() => weeklyExpenses.reduce((sum, e) => sum + e.amount, 0), [weeklyExpenses]);
   const weeklyLimitStatus = useMemo(() => getWeeklyLimitStatus(weeklyTotal), [weeklyTotal]);
 
+  // Calculate number of unique days with transactions
+  const numberOfDays = useMemo(() => {
+    if (filter === 'daily') return 1;
+    if (expenses.length === 0) return 0;
+    
+    // Count unique dates that have transactions
+    const uniqueDates = new Set(expenses.map(e => e.expense_date));
+    return uniqueDates.size;
+  }, [filter, expenses]);
+
+  const dailyAverage = useMemo(() => {
+    if (numberOfDays === 0) return 0;
+    return totalExpenses / numberOfDays;
+  }, [totalExpenses, numberOfDays]);
+
   const expensesByCategory = useMemo(() => 
     expenses.reduce<Record<string, number>>((acc, e) => {
       acc[e.category] = (acc[e.category] || 0) + e.amount;
@@ -138,6 +153,8 @@ export function useExpenses() {
     weeklyLimitStatus,
     expensesByCategory,
     expensesByDate,
+    dailyAverage,
+    numberOfDays,
     refetch: fetchExpenses,
   };
 }

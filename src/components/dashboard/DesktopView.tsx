@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Wallet, TrendingDown, Receipt, PieChart, AlertTriangle, LogOut } from 'lucide-react';
+import { Wallet, TrendingDown, Receipt, PieChart, AlertTriangle, LogOut, Calculator } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { GlassCard } from '../ui/GlassComponents';
 import { FilterTabs } from './FilterTabs';
@@ -26,6 +26,8 @@ export function DesktopView({
   weeklyLimitStatus,
   expensesByCategory,
   expensesByDate,
+  dailyAverage,
+  numberOfDays,
   addExpense,
   deleteExpense,
 }: ViewProps) {
@@ -46,7 +48,7 @@ export function DesktopView({
     custom: "Custom",
   };
 
-  const statsCards = [
+  const baseStatsCards = [
     {
       title: 'Total Spending',
       value: formatIDR(totalExpenses),
@@ -66,6 +68,19 @@ export function DesktopView({
       color: 'bg-white/40',
     },
   ];
+
+  // Add Daily Average card for weekly/monthly/custom filters
+  const statsCards = filter !== 'daily' 
+    ? [
+        ...baseStatsCards,
+        {
+          title: `Daily Average (${numberOfDays} day${numberOfDays !== 1 ? 's' : ''})`,
+          value: formatIDR(Math.round(dailyAverage)),
+          icon: Calculator,
+          color: 'bg-white/40',
+        },
+      ]
+    : baseStatsCards;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-neutral-100 via-neutral-50 to-neutral-200">
@@ -153,7 +168,7 @@ export function DesktopView({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="grid grid-cols-3 gap-6 mb-8"
+          className={`grid gap-6 mb-8 ${filter !== 'daily' ? 'grid-cols-4' : 'grid-cols-3'}`}
         >
           {statsCards.map((stat, index) => (
             <motion.div

@@ -21,6 +21,8 @@ export function BudgetTracker() {
     weeklyLimitStatus,
     expensesByCategory,
     expensesByDate,
+    dailyAverage,
+    numberOfDays,
   } = useExpenses();
 
   const isMobile = useIsMobile();
@@ -38,6 +40,8 @@ export function BudgetTracker() {
     weeklyLimitStatus,
     expensesByCategory,
     expensesByDate,
+    dailyAverage,
+    numberOfDays,
     addExpense,
     deleteExpense,
   };

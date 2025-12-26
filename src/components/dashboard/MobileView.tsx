@@ -26,6 +26,8 @@ export function MobileView({
   weeklyLimitStatus,
   expensesByCategory,
   expensesByDate,
+  dailyAverage,
+  numberOfDays,
   addExpense,
   deleteExpense,
 }: ViewProps) {
@@ -99,6 +101,28 @@ export function MobileView({
               <CalendarDays size={14} />
               <span>{expenses.length} transactions</span>
             </div>
+            
+            {/* Daily Average - only shown for weekly/monthly/custom */}
+            {filter !== 'daily' && (
+              <div className="mt-4 pt-4 border-t border-white/10">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-neutral-400 text-xs mb-0.5">Daily Average Spending</p>
+                    <motion.p
+                      key={dailyAverage}
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="text-lg font-semibold text-white"
+                    >
+                      {formatIDR(Math.round(dailyAverage))}
+                    </motion.p>
+                  </div>
+                  <p className="text-neutral-500 text-xs">
+                    over {numberOfDays} day{numberOfDays !== 1 ? 's' : ''}
+                  </p>
+                </div>
+              </div>
+            )}
           </GlassCard>
         </motion.div>
 
