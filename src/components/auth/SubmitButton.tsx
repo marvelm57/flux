@@ -13,10 +13,7 @@ export function SubmitButton({ loading, loadingText, children }: SubmitButtonPro
     <button
       type="submit"
       disabled={loading}
-      className="w-full py-3 px-4 rounded-xl bg-neutral-900 text-white font-medium
-               hover:bg-neutral-800 transition-all duration-200
-               disabled:opacity-50 disabled:cursor-not-allowed
-               flex items-center justify-center gap-2"
+      className={"w-full py-3 px-4 rounded-xl bg-neutral-900 text-white font-medium hover:bg-neutral-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"}
     >
       {loading ? (
         <>

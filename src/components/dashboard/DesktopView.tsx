@@ -113,7 +113,7 @@ export function DesktopView({
             <button
               onClick={handleLogout}
               disabled={loggingOut}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/40 backdrop-blur-sm border border-white/20 text-neutral-700 hover:bg-white/60 transition-all disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/40 backdrop-blur-sm border border-white/20 text-neutral-700 hover:text-red-500 hover:bg-red-50 transition-all duration-200 disabled:opacity-50"
             >
               <LogOut size={18} />
               <span className="text-sm font-medium">{loggingOut ? 'Logging out...' : 'Logout'}</span>

@@ -37,9 +37,7 @@ export function FormInput({
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           required={required}
-          className="w-full pl-12 pr-4 py-3 rounded-xl bg-white/50 border border-neutral-200 
-                   focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-400
-                   transition-all duration-200 text-neutral-800 placeholder:text-neutral-400"
+          className={"w-full pl-12 pr-4 py-3 rounded-xl bg-white/50 border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-400 transition-all duration-200 text-neutral-800 placeholder:text-neutral-400"}
         />
       </div>
     </div>
