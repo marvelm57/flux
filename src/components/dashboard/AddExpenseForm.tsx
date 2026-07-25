@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, FileText, Calendar as CalendarIcon, ChevronDown } from 'lucide-react';
+import { Plus, FileText, Calendar as CalendarIcon } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { BottomSheet, Modal } from '../ui/Overlays';
 import { Calendar } from '../ui/calendar';

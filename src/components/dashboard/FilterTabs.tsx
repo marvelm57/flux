@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar as CalendarIcon, ChevronDown, SlidersHorizontal } from 'lucide-react';
+import { Calendar as CalendarIcon, SlidersHorizontal } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { BottomSheet, Modal } from '../ui/Overlays';
 import { Calendar } from '../ui/calendar';
