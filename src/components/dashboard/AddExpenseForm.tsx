@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, FileText, Calendar } from 'lucide-react';
-import { format } from 'date-fns';
+import { Plus, FileText, Calendar as CalendarIcon, ChevronDown } from 'lucide-react';
+import { format, parseISO } from 'date-fns';
 import { BottomSheet, Modal } from '../ui/Overlays';
+import { Calendar } from '../ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { categories, Category } from '@/lib/categories';
 import { ExpenseInsert } from '@/lib/types';
 
@@ -36,6 +38,7 @@ interface AddExpenseFormProps {
 
 export function AddExpenseForm({ onSubmit, isMobile }: AddExpenseFormProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isDateOpen, setIsDateOpen] = useState(false);
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
   const [expenseDate, setExpenseDate] = useState(getTodayDate);
@@ -118,18 +121,29 @@ export function AddExpenseForm({ onSubmit, isMobile }: AddExpenseFormProps) {
       {/* Date Selection */}
       <div>
         <label className="mb-2 block text-sm font-medium text-neutral-600">Date</label>
-        <div className="relative">
-          <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400">
-            <Calendar size={18} />
-          </div>
-          <input
-            type="date"
-            value={expenseDate}
-            onChange={(e) => setExpenseDate(e.target.value)}
-            max={getTodayDate()}
-            className="w-full rounded-xl border border-neutral-200 bg-white/50 py-3 pl-12 pr-4 text-neutral-900 transition-all duration-200 focus:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
-          />
-        </div>
+        <Popover open={isDateOpen} onOpenChange={setIsDateOpen}>
+          <PopoverTrigger className="flex w-full items-center gap-3 rounded-xl border border-neutral-200 bg-white/50 px-4 py-3 text-left text-neutral-900 transition-all duration-200 hover:bg-white/70 focus:outline-none focus:ring-2 focus:ring-neutral-900/10">
+            <CalendarIcon size={18} className="shrink-0 text-neutral-400" />
+            <span className="flex-1 text-neutral-900">{format(parseISO(expenseDate), 'dd/MM/yyyy')}</span>
+          </PopoverTrigger>
+          <PopoverContent
+            align="start"
+            sideOffset={10}
+            className="w-auto border border-neutral-200 bg-white p-0 shadow-xl shadow-neutral-200/70"
+          >
+            <Calendar
+              mode="single"
+              selected={parseISO(expenseDate)}
+              onSelect={(date) => {
+                if (date) {
+                  setExpenseDate(format(date, 'yyyy-MM-dd'));
+                  setIsDateOpen(false);
+                }
+              }}
+              disabled={(date) => date > new Date()}
+            />
+          </PopoverContent>
+        </Popover>
       </div>
 
       {/* Description */}

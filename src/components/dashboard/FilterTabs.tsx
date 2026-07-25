@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, SlidersHorizontal } from 'lucide-react';
-import { format } from 'date-fns';
+import { Calendar as CalendarIcon, ChevronDown, SlidersHorizontal } from 'lucide-react';
+import { format, parseISO } from 'date-fns';
 import { BottomSheet, Modal } from '../ui/Overlays';
+import { Calendar } from '../ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { FilterType } from '@/hooks/useExpenses';
 
 // Get today's date in YYYY-MM-DD format
@@ -26,6 +28,8 @@ export function FilterTabs({
   onCustomDateChange 
 }: FilterTabsProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isStartDateOpen, setIsStartDateOpen] = useState(false);
+  const [isEndDateOpen, setIsEndDateOpen] = useState(false);
   const [startDate, setStartDate] = useState(customDateRange?.start || getTodayDate());
   const [endDate, setEndDate] = useState(customDateRange?.end || getTodayDate());
 
@@ -72,36 +76,49 @@ export function FilterTabs({
       {/* Start Date */}
       <div>
         <label className="mb-2 block text-sm font-medium text-neutral-600">Start Date</label>
-        <div className="relative">
-          <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400">
-            <Calendar size={18} />
-          </div>
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            max={endDate || getTodayDate()}
-            className="w-full rounded-xl border border-neutral-200 bg-white/50 py-3 pl-12 pr-4 text-neutral-900 transition-all duration-200 focus:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
-          />
-        </div>
+        <Popover open={isStartDateOpen} onOpenChange={setIsStartDateOpen}>
+          <PopoverTrigger className="flex w-full items-center gap-3 rounded-xl border border-neutral-200 bg-white/50 px-4 py-3 text-left text-neutral-900 transition-all duration-200 hover:bg-white/70 focus:outline-none focus:ring-2 focus:ring-neutral-900/10">
+            <CalendarIcon size={18} className="shrink-0 text-neutral-400" />
+            <span className="flex-1 text-neutral-900">{format(parseISO(startDate), 'dd/MM/yyyy')}</span>
+          </PopoverTrigger>
+          <PopoverContent align="start" sideOffset={10} className="w-auto border border-neutral-200 bg-white p-0 shadow-xl shadow-neutral-200/70">
+            <Calendar
+              mode="single"
+              selected={parseISO(startDate)}
+              onSelect={(date) => {
+                if (date) {
+                  setStartDate(format(date, 'yyyy-MM-dd'));
+                  setIsStartDateOpen(false);
+                }
+              }}
+              disabled={(date) => date > parseISO(endDate || getTodayDate())}
+            />
+          </PopoverContent>
+        </Popover>
       </div>
 
       {/* End Date */}
       <div>
         <label className="mb-2 block text-sm font-medium text-neutral-600">End Date</label>
-        <div className="relative">
-          <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400">
-            <Calendar size={18} />
-          </div>
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            min={startDate}
-            max={getTodayDate()}
-            className="w-full rounded-xl border border-neutral-200 bg-white/50 py-3 pl-12 pr-4 text-neutral-900 transition-all duration-200 focus:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
-          />
-        </div>
+        <Popover open={isEndDateOpen} onOpenChange={setIsEndDateOpen}>
+          <PopoverTrigger className="flex w-full items-center gap-3 rounded-xl border border-neutral-200 bg-white/50 px-4 py-3 text-left text-neutral-900 transition-all duration-200 hover:bg-white/70 focus:outline-none focus:ring-2 focus:ring-neutral-900/10">
+            <CalendarIcon size={18} className="shrink-0 text-neutral-400" />
+            <span className="flex-1 text-neutral-900">{format(parseISO(endDate), 'dd/MM/yyyy')}</span>
+          </PopoverTrigger>
+          <PopoverContent align="start" sideOffset={10} className="w-auto border border-neutral-200 bg-white p-0 shadow-xl shadow-neutral-200/70">
+            <Calendar
+              mode="single"
+              selected={parseISO(endDate)}
+              onSelect={(date) => {
+                if (date) {
+                  setEndDate(format(date, 'yyyy-MM-dd'));
+                  setIsEndDateOpen(false);
+                }
+              }}
+              disabled={(date) => date < parseISO(startDate) || date > new Date()}
+            />
+          </PopoverContent>
+        </Popover>
       </div>
 
       {/* Quick Presets */}
