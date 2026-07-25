@@ -168,7 +168,7 @@ export function DesktopView({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className={`grid gap-6 mb-8 ${filter !== 'daily' ? 'grid-cols-4' : 'grid-cols-3'}`}
+          className={`grid gap-6 mb-8 ${filter !== 'daily' ? 'grid-cols-2 xl:grid-cols-4' : 'grid-cols-3'}`}
         >
           {statsCards.map((stat, index) => (
             <motion.div

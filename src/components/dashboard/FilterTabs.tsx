@@ -150,7 +150,7 @@ export function FilterTabs({
         <div className="relative isolate flex w-full items-center justify-between overflow-hidden rounded-[50px] border-[0.75px] border-white/0 bg-[rgba(255,255,255,0.1)] p-[5px]">
           <div
             aria-hidden
-            className="pointer-events-none absolute left-[-15.75px] top-[-17.75px] z-[1] h-[81px] w-[344px] bg-[rgba(255,255,255,0.01)] backdrop-blur-[2px]"
+            className="pointer-events-none absolute inset-0 z-[1] h-full w-full bg-[rgba(255,255,255,0.01)] backdrop-blur-[2px]"
           />
 
           <motion.div
@@ -165,7 +165,6 @@ export function FilterTabs({
             animate={{ x: `${Math.max(activeIndex, 0) * 100}%` }}
             transition={{ type: 'spring', damping: 28, stiffness: 320 }}
           >
-            <div className="absolute -left-[6px] -top-[5px] h-[45px] w-[106px] bg-[rgba(255,255,255,0.01)] backdrop-blur-[2px] shadow-[inset_0px_-1px_2px_rgba(0,0,0,0.1),inset_0px_0px_2px_rgba(255,255,255,0.2)]" />
             <div className="absolute inset-0 rounded-[50px] bg-[rgba(255,255,255,0.3)] shadow-[inset_0px_-1px_2px_rgba(0,0,0,0.1),inset_0px_0px_2px_rgba(255,255,255,0.2)]" />
           </motion.div>
 

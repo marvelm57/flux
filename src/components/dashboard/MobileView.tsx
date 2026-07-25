@@ -178,15 +178,13 @@ export function MobileView({
           transition={{ delay: 0.15 }}
           className="mb-6"
         >
-          <GlassCard variant="light" padding="sm" rounded="2xl">
-            <FilterTabs 
+          <FilterTabs 
               filter={filter} 
               setFilter={setFilter} 
               isMobile={true}
               customDateRange={customDateRange}
               onCustomDateChange={setCustomDateRange}
-            />
-          </GlassCard>
+          />
         </motion.div>
 
         {/* Chart */}

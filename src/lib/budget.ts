@@ -13,10 +13,10 @@ export function formatIDR(amount: number): string {
 
 export function formatIDRCompact(amount: number): string {
   if (amount >= 1000000) {
-    return `Rp ${(amount / 1000000).toFixed(1)}jt`;
+    return `Rp${(amount / 1000000).toFixed(1)}jt`;
   }
   if (amount >= 1000) {
-    return `Rp ${(amount / 1000).toFixed(0)}rb`;
+    return `Rp${(amount / 1000).toFixed(0)}rb`;
   }
   return formatIDR(amount);
 }

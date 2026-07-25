@@ -193,7 +193,7 @@ export function ExpenseChart({
               No data to display
             </div>
           ) : (
-            <div className="flex items-center gap-4">
+            <div className="h-48 flex items-center gap-4">
               <div className="w-32 h-32">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
