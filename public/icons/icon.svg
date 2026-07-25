@@ -31,22 +31,22 @@
     </radialGradient>
   </defs>
 
-  <!-- Full 512x512 background card (10px UI radius ratio -> rx="91") -->
-  <rect width="512" height="512" rx="91" fill="url(#bgGrad)"/>
-  <rect width="512" height="512" rx="91" fill="url(#glassReflection)"/>
+  <!-- Full 512x512 background card (20% radius -> rx="102") -->
+  <rect width="512" height="512" rx="102" fill="url(#bgGrad)"/>
+  <rect width="512" height="512" rx="102" fill="url(#glassReflection)"/>
   
-  <!-- Base card outline border (GlassCard variant="dark") -->
-  <rect x="3" y="3" width="506" height="506" rx="88" fill="none" stroke="#ffffff" stroke-opacity="0.15" stroke-width="2"/>
+  <!-- Base card inside outline border (GlassCard variant="dark") -->
+  <rect x="6" y="6" width="500" height="500" rx="96" fill="none" stroke="#ffffff" stroke-opacity="0.15" stroke-width="2"/>
 
-  <!-- Top-Left Corner Stroke (heavier on corner edge, lighter on sides) -->
-  <path d="M 256 4 L 95 4 A 91 91 0 0 0 4 95 L 4 256"
+  <!-- Top-Left INSIDE Corner Stroke -->
+  <path d="M 256 6 L 102 6 A 96 96 0 0 0 6 102 L 6 256"
         fill="none"
         stroke="url(#tlGrad)"
         stroke-width="6"
         stroke-linecap="round"/>
 
-  <!-- Bottom-Right Corner Stroke (heavier on corner edge, lighter on sides) -->
-  <path d="M 256 508 L 417 508 A 91 91 0 0 0 508 417 L 508 256"
+  <!-- Bottom-Right INSIDE Corner Stroke -->
+  <path d="M 256 506 L 410 506 A 96 96 0 0 0 506 410 L 506 256"
         fill="none"
         stroke="url(#brGrad)"
         stroke-width="6"
