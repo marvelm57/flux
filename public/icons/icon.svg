@@ -15,7 +15,7 @@
     </linearGradient>
 
     <!-- Top-Left Corner Gradient Stroke: heavier on edges/corners, lighter on the sides -->
-    <radialGradient id="tlGrad" cx="0" cy="0" r="300" gradientUnits="userSpaceOnUse">
+    <radialGradient id="tlGrad" cx="0" cy="0" r="310" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#ffffff" stop-opacity="1.0"/>
       <stop offset="25%" stop-color="#ffffff" stop-opacity="0.85"/>
       <stop offset="65%" stop-color="#ffffff" stop-opacity="0.2"/>
@@ -23,7 +23,7 @@
     </radialGradient>
 
     <!-- Bottom-Right Corner Gradient Stroke: heavier on edges/corners, lighter on the sides -->
-    <radialGradient id="brGrad" cx="512" cy="512" r="300" gradientUnits="userSpaceOnUse">
+    <radialGradient id="brGrad" cx="512" cy="512" r="310" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#ffffff" stop-opacity="1.0"/>
       <stop offset="25%" stop-color="#ffffff" stop-opacity="0.85"/>
       <stop offset="65%" stop-color="#ffffff" stop-opacity="0.2"/>
@@ -31,22 +31,22 @@
     </radialGradient>
   </defs>
 
-  <!-- Full 512x512 background card with rounded="lg" radius (rx="64") -->
-  <rect width="512" height="512" rx="64" fill="url(#bgGrad)"/>
-  <rect width="512" height="512" rx="64" fill="url(#glassReflection)"/>
+  <!-- Full 512x512 background card (10px UI radius ratio -> rx="91") -->
+  <rect width="512" height="512" rx="91" fill="url(#bgGrad)"/>
+  <rect width="512" height="512" rx="91" fill="url(#glassReflection)"/>
   
   <!-- Base card outline border (GlassCard variant="dark") -->
-  <rect x="3" y="3" width="506" height="506" rx="61" fill="none" stroke="#ffffff" stroke-opacity="0.15" stroke-width="2"/>
+  <rect x="3" y="3" width="506" height="506" rx="88" fill="none" stroke="#ffffff" stroke-opacity="0.15" stroke-width="2"/>
 
-  <!-- Top-Left Corner Stroke (rounded="lg" arc, heavier on corner edge, lighter on sides) -->
-  <path d="M 256 4 L 68 4 A 64 64 0 0 0 4 68 L 4 256"
+  <!-- Top-Left Corner Stroke (heavier on corner edge, lighter on sides) -->
+  <path d="M 256 4 L 95 4 A 91 91 0 0 0 4 95 L 4 256"
         fill="none"
         stroke="url(#tlGrad)"
         stroke-width="6"
         stroke-linecap="round"/>
 
-  <!-- Bottom-Right Corner Stroke (rounded="lg" arc, heavier on corner edge, lighter on sides) -->
-  <path d="M 256 508 L 444 508 A 64 64 0 0 0 508 444 L 508 256"
+  <!-- Bottom-Right Corner Stroke (heavier on corner edge, lighter on sides) -->
+  <path d="M 256 508 L 417 508 A 91 91 0 0 0 508 417 L 508 256"
         fill="none"
         stroke="url(#brGrad)"
         stroke-width="6"
