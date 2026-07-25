@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, FileText, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
-import { GlassButton, GlassInput } from '../ui/GlassComponents';
 import { BottomSheet, Modal } from '../ui/Overlays';
 import { categories, Category } from '@/lib/categories';
 import { ExpenseInsert } from '@/lib/types';
@@ -74,39 +73,43 @@ export function AddExpenseForm({ onSubmit, isMobile }: AddExpenseFormProps) {
     <div className="space-y-5">
       {/* Amount Input */}
       <div>
-        <label className="block text-sm font-medium text-neutral-600 mb-2">Amount (IDR)</label>
-        <GlassInput
-          type="text"
-          inputMode="numeric"
-          placeholder="0"
-          value={amount}
-          onChange={(e) => setAmount(formatWithThousandSeparator(e.target.value))}
-          icon={<RupiahIcon size={18} />}
-          className="text-2xl font-semibold"
-        />
+        <label className="mb-2 block text-sm font-medium text-neutral-600">Amount (IDR)</label>
+        <div className="relative">
+          <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400">
+            <RupiahIcon size={18} />
+          </div>
+          <input
+            type="text"
+            inputMode="numeric"
+            placeholder="0"
+            value={amount}
+            onChange={(e) => setAmount(formatWithThousandSeparator(e.target.value))}
+            className="w-full rounded-xl border border-neutral-200 bg-white/50 py-3 pl-12 pr-4 text-2xl font-semibold text-neutral-900 placeholder:text-neutral-400 transition-all duration-200 focus:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
+          />
+        </div>
       </div>
 
       {/* Category Selection */}
       <div>
-        <label className="block text-sm font-medium text-neutral-600 mb-2">Category</label>
+        <label className="mb-2 block text-sm font-medium text-neutral-600">Category</label>
         <div className={`grid gap-2 ${isMobile ? 'grid-cols-4' : 'grid-cols-6'}`}>
           {categories.map((category) => (
             <motion.button
               key={category.id}
               onClick={() => setSelectedCategory(category)}
               className={`
-                relative flex flex-col items-center gap-1 p-3 rounded-xl
+                relative isolate flex flex-col items-center gap-1 overflow-hidden rounded-xl border p-3
                 transition-all duration-200
                 ${
                   selectedCategory.id === category.id
-                    ? 'bg-neutral-900 text-white'
-                    : 'bg-white/30 text-neutral-600 hover:bg-white/50'
+                    ? 'border-neutral-900/85 bg-neutral-900 text-white shadow-[inset_0px_-1px_2px_rgba(0,0,0,0.35),inset_0px_1px_2px_rgba(255,255,255,0.08)]'
+                    : 'border-white/80 bg-white/55 text-neutral-700 shadow-[inset_0px_-1px_2px_rgba(0,0,0,0.08),inset_0px_1px_2px_rgba(255,255,255,0.8)] hover:bg-white/75'
                 }
               `}
               whileTap={{ scale: 0.95 }}
             >
-              <category.icon size={20} />
-              <span className="text-xs truncate w-full text-center">{category.name.split(' ')[0]}</span>
+              <category.icon size={20} className="relative z-[2]" />
+              <span className="relative z-[2] w-full truncate text-center text-xs">{category.name.split(' ')[0]}</span>
             </motion.button>
           ))}
         </div>
@@ -114,46 +117,55 @@ export function AddExpenseForm({ onSubmit, isMobile }: AddExpenseFormProps) {
 
       {/* Date Selection */}
       <div>
-        <label className="block text-sm font-medium text-neutral-600 mb-2">Date</label>
-        <GlassInput
-          type="date"
-          value={expenseDate}
-          onChange={(e) => setExpenseDate(e.target.value)}
-          icon={<Calendar size={18} />}
-          max={getTodayDate()}
-        />
+        <label className="mb-2 block text-sm font-medium text-neutral-600">Date</label>
+        <div className="relative">
+          <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400">
+            <Calendar size={18} />
+          </div>
+          <input
+            type="date"
+            value={expenseDate}
+            onChange={(e) => setExpenseDate(e.target.value)}
+            max={getTodayDate()}
+            className="w-full rounded-xl border border-neutral-200 bg-white/50 py-3 pl-12 pr-4 text-neutral-900 transition-all duration-200 focus:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
+          />
+        </div>
       </div>
 
       {/* Description */}
       <div>
-        <label className="block text-sm font-medium text-neutral-600 mb-2">Description (Optional)</label>
-        <GlassInput
-          type="text"
-          placeholder="Add a note..."
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          icon={<FileText size={18} />}
-        />
+        <label className="mb-2 block text-sm font-medium text-neutral-600">Description (Optional)</label>
+        <div className="relative">
+          <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400">
+            <FileText size={18} />
+          </div>
+          <input
+            type="text"
+            placeholder="Add a note..."
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="w-full rounded-xl border border-neutral-200 bg-white/50 py-3 pl-12 pr-4 text-neutral-900 placeholder:text-neutral-400 transition-all duration-200 focus:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
+          />
+        </div>
       </div>
 
       {/* Submit Button */}
-      <GlassButton
-        variant="primary"
-        fullWidth
+      <button
+        type="button"
         onClick={handleSubmit}
         disabled={!amount || parseFormattedNumber(amount) <= 0 || isSubmitting}
-        className="py-4 text-lg mt-4"
+        className="mt-4 flex h-12 w-full items-center justify-center rounded-xl bg-neutral-900 px-4 text-base font-medium text-white transition-colors duration-200 hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {isSubmitting ? (
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-            className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full mx-auto"
+            className="h-5 w-5 rounded-full border-2 border-white/30 border-t-white"
           />
         ) : (
           'Add Expense'
         )}
-      </GlassButton>
+      </button>
     </div>
   );
 
@@ -166,27 +178,35 @@ export function AddExpenseForm({ onSubmit, isMobile }: AddExpenseFormProps) {
         animate={{ scale: 1 }}
         transition={{ type: 'spring', damping: 15, stiffness: 300, delay: 0.3 }}
       >
-        <GlassButton
-          variant="primary"
-          size="icon"
+        <button
+          type="button"
           onClick={() => setIsOpen(true)}
           className={`
-            ${isMobile ? 'w-14 h-14' : 'w-16 h-16'} 
-            rounded-full shadow-lg shadow-neutral-900/20
-            flex items-center justify-center
+            flex items-center justify-center rounded-full bg-neutral-900 text-white shadow-lg shadow-neutral-900/20 transition-colors duration-200 hover:bg-neutral-800
+            ${isMobile ? 'h-14 w-14' : 'h-16 w-16'}
           `}
         >
           <Plus size={isMobile ? 24 : 28} />
-        </GlassButton>
+        </button>
       </motion.div>
 
       {/* Form Modal/Sheet */}
       {isMobile ? (
-        <BottomSheet isOpen={isOpen} onClose={() => setIsOpen(false)} title="Add Expense">
+        <BottomSheet
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          title="Add Expense"
+          cardClassName="bg-white/60 border border-white/50 shadow-xl shadow-neutral-200/50 backdrop-blur-xl"
+        >
           {formContent}
         </BottomSheet>
       ) : (
-        <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title="Add Expense">
+        <Modal
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          title="Add Expense"
+          cardClassName="bg-white/60 border border-white/50 shadow-xl shadow-neutral-200/50 backdrop-blur-xl"
+        >
           {formContent}
         </Modal>
       )}

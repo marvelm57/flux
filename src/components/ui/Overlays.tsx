@@ -4,16 +4,29 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { ReactNode, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { GlassCard, GlassButton } from './GlassComponents';
+import { GlassCard } from './GlassComponents';
 
 interface BottomSheetProps {
   isOpen: boolean;
   onClose: () => void;
   children: ReactNode;
   title?: string;
+  cardClassName?: string;
+  headerClassName?: string;
+  contentClassName?: string;
+  closeButtonClassName?: string;
 }
 
-export function BottomSheet({ isOpen, onClose, children, title }: BottomSheetProps) {
+export function BottomSheet({
+  isOpen,
+  onClose,
+  children,
+  title,
+  cardClassName = '',
+  headerClassName = '',
+  contentClassName = '',
+  closeButtonClassName = '',
+}: BottomSheetProps) {
   // Prevent body scroll when sheet is open
   useEffect(() => {
     if (isOpen) {
@@ -56,26 +69,30 @@ export function BottomSheet({ isOpen, onClose, children, title }: BottomSheetPro
               blur="xl"
               padding="none"
               rounded="3xl"
-              className="mx-2 mb-2 overflow-hidden"
+              className={`mx-2 mb-2 overflow-hidden ${cardClassName}`}
               style={{ borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}
             >
               {/* Handle */}
               <div className="flex justify-center pt-3 pb-2">
-                <div className="w-10 h-1 bg-neutral-400/50 rounded-full" />
+                <div className="h-1 w-10 rounded-full bg-neutral-300" />
               </div>
 
               {/* Header */}
               {title && (
-                <div className="flex items-center justify-between px-5 pb-4 border-b border-white/20">
-                  <h2 className="text-lg font-semibold text-neutral-800">{title}</h2>
-                  <GlassButton variant="ghost" size="icon" onClick={onClose}>
+                <div className={`flex items-center justify-between border-b border-neutral-200 px-5 pb-4 ${headerClassName}`}>
+                  <h2 className="text-lg font-semibold text-neutral-900">{title}</h2>
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className={`flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-700 shadow-sm transition-colors hover:bg-neutral-100 ${closeButtonClassName}`}
+                  >
                     <X size={20} />
-                  </GlassButton>
+                  </button>
                 </div>
               )}
 
               {/* Content */}
-              <div className="px-5 py-4 max-h-[70vh] overflow-y-auto">{children}</div>
+              <div className={`max-h-[70vh] overflow-y-auto px-5 py-4 ${contentClassName}`}>{children}</div>
             </GlassCard>
           </motion.div>
         </>
@@ -91,9 +108,22 @@ interface ModalProps {
   onClose: () => void;
   children: ReactNode;
   title?: string;
+  cardClassName?: string;
+  headerClassName?: string;
+  contentClassName?: string;
+  closeButtonClassName?: string;
 }
 
-export function Modal({ isOpen, onClose, children, title }: ModalProps) {
+export function Modal({
+  isOpen,
+  onClose,
+  children,
+  title,
+  cardClassName = '',
+  headerClassName = '',
+  contentClassName = '',
+  closeButtonClassName = '',
+}: ModalProps) {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -128,16 +158,20 @@ export function Modal({ isOpen, onClose, children, title }: ModalProps) {
               onClick={(e) => e.stopPropagation()}
               className="w-full max-w-md"
             >
-              <GlassCard variant="light" blur="xl" padding="none" rounded="2xl">
+              <GlassCard variant="light" blur="xl" padding="none" rounded="2xl" className={cardClassName}>
                 {title && (
-                  <div className="flex items-center justify-between px-6 py-4 border-b border-white/20">
-                    <h2 className="text-lg font-semibold text-neutral-800">{title}</h2>
-                    <GlassButton variant="ghost" size="icon" onClick={onClose}>
+                  <div className={`flex items-center justify-between px-6 py-4 border-b border-neutral-200 ${headerClassName}`}>
+                    <h2 className="text-lg font-semibold text-neutral-900">{title}</h2>
+                    <button
+                      type="button"
+                      onClick={onClose}
+                      className={`flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-700 shadow-sm transition-colors hover:bg-neutral-100 ${closeButtonClassName}`}
+                    >
                       <X size={20} />
-                    </GlassButton>
+                    </button>
                   </div>
                 )}
-                <div className="p-6">{children}</div>
+                <div className={`p-6 ${contentClassName}`}>{children}</div>
               </GlassCard>
             </motion.div>
           </motion.div>

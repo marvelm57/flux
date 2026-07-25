@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, SlidersHorizontal } from 'lucide-react';
 import { format } from 'date-fns';
-import { GlassCard, GlassButton, GlassInput } from '../ui/GlassComponents';
 import { BottomSheet, Modal } from '../ui/Overlays';
 import { FilterType } from '@/hooks/useExpenses';
 
@@ -66,36 +65,48 @@ export function FilterTabs({
     return 'Custom';
   };
 
+  const activeIndex = filters.findIndex((f) => f.value === filter);
+
   const formContent = (
     <div className="space-y-5">
       {/* Start Date */}
       <div>
-        <label className="block text-sm font-medium text-neutral-600 mb-2">Start Date</label>
-        <GlassInput
-          type="date"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-          icon={<Calendar size={18} />}
-          max={endDate || getTodayDate()}
-        />
+        <label className="mb-2 block text-sm font-medium text-neutral-600">Start Date</label>
+        <div className="relative">
+          <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400">
+            <Calendar size={18} />
+          </div>
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            max={endDate || getTodayDate()}
+            className="w-full rounded-xl border border-neutral-200 bg-white/50 py-3 pl-12 pr-4 text-neutral-900 transition-all duration-200 focus:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
+          />
+        </div>
       </div>
 
       {/* End Date */}
       <div>
-        <label className="block text-sm font-medium text-neutral-600 mb-2">End Date</label>
-        <GlassInput
-          type="date"
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-          icon={<Calendar size={18} />}
-          min={startDate}
-          max={getTodayDate()}
-        />
+        <label className="mb-2 block text-sm font-medium text-neutral-600">End Date</label>
+        <div className="relative">
+          <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400">
+            <Calendar size={18} />
+          </div>
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            min={startDate}
+            max={getTodayDate()}
+            className="w-full rounded-xl border border-neutral-200 bg-white/50 py-3 pl-12 pr-4 text-neutral-900 transition-all duration-200 focus:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
+          />
+        </div>
       </div>
 
       {/* Quick Presets */}
       <div>
-        <label className="block text-sm font-medium text-neutral-600 mb-2">Quick Select</label>
+        <label className="mb-2 block text-sm font-medium text-neutral-600">Quick Select</label>
         <div className="grid grid-cols-2 gap-2">
           {[
             { label: 'Last 7 Days', days: 7 },
@@ -112,7 +123,7 @@ export function FilterTabs({
                 setStartDate(format(start, 'yyyy-MM-dd'));
                 setEndDate(format(end, 'yyyy-MM-dd'));
               }}
-              className="py-2.5 px-4 rounded-xl text-sm font-medium bg-white/30 text-neutral-600 hover:bg-white/50 transition-colors"
+              className="rounded-xl border border-neutral-200 bg-white/50 px-4 py-2.5 text-sm font-medium text-neutral-700 transition-all duration-200 hover:bg-white/80"
               whileTap={{ scale: 0.95 }}
             >
               {preset.label}
@@ -122,49 +133,70 @@ export function FilterTabs({
       </div>
 
       {/* Apply Button */}
-      <GlassButton
-        variant="primary"
-        fullWidth
+      <button
+        type="button"
         onClick={handleApplyCustomFilter}
         disabled={!startDate || !endDate}
-        className="py-4 text-lg mt-4"
+        className="mt-4 flex h-12 w-full items-center justify-center rounded-xl bg-neutral-900 px-4 text-base font-medium text-white transition-colors duration-200 hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
       >
         Apply Filter
-      </GlassButton>
+      </button>
     </div>
   );
 
   if (isMobile) {
     return (
       <>
-        <div className="flex gap-2 px-1">
+        <div className="relative isolate flex w-full items-center justify-between overflow-hidden rounded-[50px] border-[0.75px] border-white/0 bg-[rgba(255,255,255,0.1)] p-[5px]">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute left-[-15.75px] top-[-17.75px] z-[1] h-[81px] w-[344px] bg-[rgba(255,255,255,0.01)] backdrop-blur-[2px]"
+          />
+
+          <motion.div
+            aria-hidden
+            className="pointer-events-none absolute z-[2] overflow-hidden rounded-[60px]"
+            style={{
+              width: `calc((100% - 10px) / ${filters.length})`,
+              left: 5,
+              top: 4.25,
+              bottom: 4.25,
+            }}
+            animate={{ x: `${Math.max(activeIndex, 0) * 100}%` }}
+            transition={{ type: 'spring', damping: 28, stiffness: 320 }}
+          >
+            <div className="absolute -left-[6px] -top-[5px] h-[45px] w-[106px] bg-[rgba(255,255,255,0.01)] backdrop-blur-[2px] shadow-[inset_0px_-1px_2px_rgba(0,0,0,0.1),inset_0px_0px_2px_rgba(255,255,255,0.2)]" />
+            <div className="absolute inset-0 rounded-[50px] bg-[rgba(255,255,255,0.3)] shadow-[inset_0px_-1px_2px_rgba(0,0,0,0.1),inset_0px_0px_2px_rgba(255,255,255,0.2)]" />
+          </motion.div>
+
           {filters.map((f) => (
             <motion.button
               key={f.value}
               onClick={() => handleFilterClick(f.value)}
               className={`
-                relative flex-1 py-2.5 px-3 rounded-xl text-sm font-medium
+                relative z-[4] flex min-w-px flex-1 items-center justify-center rounded-[50px]
+                px-2 py-[10px] text-center text-sm font-semibold tracking-[-0.08px]
                 transition-colors duration-200
-                ${filter === f.value ? 'text-neutral-900' : 'text-neutral-500'}
+                ${filter === f.value ? 'text-dark' : 'text-dark/90'}
               `}
               whileTap={{ scale: 0.95 }}
             >
-              {filter === f.value && (
-                <motion.div
-                  layoutId="activeFilter"
-                  className="absolute inset-0 bg-white/40 border border-white/50 rounded-xl shadow-sm"
-                  transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                />
-              )}
-              <span className="relative z-10 flex items-center justify-center gap-1">
+              <span className="relative z-10 flex max-w-full items-center justify-center gap-1 truncate">
                 {f.value === 'custom' && <SlidersHorizontal size={14} />}
-                {f.value === 'custom' ? getCustomLabel() : f.label}
+                <span className="truncate">{f.value === 'custom' ? getCustomLabel() : f.label}</span>
               </span>
             </motion.button>
           ))}
+
+          <div className="pointer-events-none absolute inset-0 z-[5] rounded-[inherit] shadow-[inset_0px_-2px_6px_0px_rgba(0,0,0,0.2),inset_0px_2px_8px_0px_rgba(255,255,255,0.4)]" />
         </div>
 
-        <BottomSheet isOpen={isOpen} onClose={() => setIsOpen(false)} title="Custom Date Range">
+        <BottomSheet
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          title="Custom Date Range"
+          cardClassName="bg-white/60 border border-white/50 shadow-xl shadow-neutral-200/50 backdrop-blur-xl"
+        >
           {formContent}
         </BottomSheet>
       </>
@@ -173,34 +205,56 @@ export function FilterTabs({
 
   return (
     <>
-      <GlassCard variant="frosted" padding="sm" rounded="xl" className="inline-flex gap-1">
+      <div className="relative isolate flex w-[300px] items-center justify-between overflow-hidden rounded-[50px] border-[0.75px] border-white/0 bg-[rgba(255,255,255,0.1)] p-[5px]">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute left-[-15.75px] top-[-17.75px] z-[1] h-[81px] w-[344px] bg-[rgba(255,255,255,0.01)] backdrop-blur-[2px]"
+        />
+
+        <motion.div
+          aria-hidden
+          className="pointer-events-none absolute z-[2] overflow-hidden rounded-[60px]"
+          style={{
+            width: `calc((100% - 10px) / ${filters.length})`,
+            left: 5,
+            top: 4.25,
+            bottom: 4.25,
+          }}
+          animate={{ x: `${Math.max(activeIndex, 0) * 100}%` }}
+          transition={{ type: 'spring', damping: 28, stiffness: 320 }}
+        >
+          <div className="absolute -left-[6px] -top-[5px] h-[45px] w-[106px] bg-[rgba(255,255,255,0.01)] backdrop-blur-[2px] shadow-[inset_0px_-1px_2px_rgba(0,0,0,0.1),inset_0px_0px_2px_rgba(255,255,255,0.2)]" />
+          <div className="absolute inset-0 rounded-[50px] bg-[rgba(255,255,255,0.3)] shadow-[inset_0px_-1px_2px_rgba(0,0,0,0.1),inset_0px_0px_2px_rgba(255,255,255,0.2)]" />
+        </motion.div>
+
         {filters.map((f) => (
           <motion.button
             key={f.value}
             onClick={() => handleFilterClick(f.value)}
             className={`
-              relative py-2 px-5 rounded-lg text-sm font-medium
+              relative z-[4] flex min-w-px flex-1 items-center justify-center rounded-[50px]
+              px-2 py-[10px] text-sm font-semibold tracking-[-0.08px]
               transition-colors duration-200
-              ${filter === f.value ? 'text-neutral-900' : 'text-neutral-500 hover:text-neutral-700'}
+              ${filter === f.value ? 'text-dark' : 'text-dark/90'}
             `}
             whileTap={{ scale: 0.97 }}
           >
-            {filter === f.value && (
-              <motion.div
-                layoutId="activeFilterDesktop"
-                className="absolute inset-0 bg-white/50 border border-white/60 rounded-lg shadow-sm"
-                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              />
-            )}
-            <span className="relative z-10 flex items-center gap-1">
+            <span className="relative z-10 flex max-w-full items-center gap-1 truncate">
               {f.value === 'custom' && <SlidersHorizontal size={14} />}
-              {f.value === 'custom' ? getCustomLabel() : f.label}
+              <span className="truncate">{f.value === 'custom' ? getCustomLabel() : f.label}</span>
             </span>
           </motion.button>
         ))}
-      </GlassCard>
 
-      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title="Custom Date Range">
+        <div className="pointer-events-none absolute inset-0 z-[5] rounded-[inherit] shadow-[inset_0px_-2px_6px_0px_rgba(0,0,0,0.2),inset_0px_2px_8px_0px_rgba(255,255,255,0.4)]" />
+      </div>
+
+      <Modal
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        title="Custom Date Range"
+        cardClassName="bg-white/60 border border-white/50 shadow-xl shadow-neutral-200/50 backdrop-blur-xl"
+      >
         {formContent}
       </Modal>
     </>
