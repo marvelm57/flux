@@ -52,24 +52,11 @@ export function ExpenseList({ expenses, onDelete, isMobile }: ExpenseListProps) 
     {} as Record<string, Expense[]>
   );
 
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: { staggerChildren: 0.05 },
-    },
-  };
-
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 },
-  };
-
   const hasMore = expenses.length > displayCount;
 
   return (
     <div className="space-y-6">
-      <motion.div variants={container} initial="hidden" animate="show" className="space-y-6">
+      <div className="space-y-6">
         {Object.entries(groupedExpenses).map(([dateStr, dateExpenses]) => {
           const dateTotal = dateExpenses.reduce((sum, e) => sum + Number(e.amount), 0);
           const parsedDate = parseISO(dateStr);
@@ -96,7 +83,12 @@ export function ExpenseList({ expenses, onDelete, isMobile }: ExpenseListProps) 
                     : 'Just now';
 
                   return (
-                    <motion.div key={expense.id} variants={item}>
+                    <motion.div
+                      key={expense.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
                       <GlassCard
                         variant="light"
                         padding={isMobile ? 'sm' : 'md'}
@@ -147,7 +139,7 @@ export function ExpenseList({ expenses, onDelete, isMobile }: ExpenseListProps) 
             </div>
           );
         })}
-      </motion.div>
+      </div>
 
       {hasMore && (
         <div className="flex justify-center pt-4">

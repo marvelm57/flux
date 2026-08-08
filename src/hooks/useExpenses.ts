@@ -97,7 +97,7 @@ export function useExpenses() {
   const weeklyExpenses = isWeeklyFilter ? expenses : separateWeeklyExpenses;
   const loading = loadingExpenses;
 
-  // Add Expense Mutation (Optimistic Update)
+  // Add Expense Mutation
   const addExpenseMutation = useMutation({
     mutationFn: async (newExpense: ExpenseInsert) => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -112,31 +112,30 @@ export function useExpenses() {
       if (error) throw error;
       return data;
     },
-    onMutate: async (newExpense) => {
-      await queryClient.cancelQueries({ queryKey: ['expenses'] });
+    onSuccess: (savedExpense) => {
+      if (!savedExpense) return;
 
-      const optimisticItem: Expense = {
-        id: 'temp-' + Date.now(),
-        amount: newExpense.amount,
-        category: newExpense.category,
-        description: newExpense.description ?? null,
-        expense_date: newExpense.expense_date || toDateString(new Date()),
-        user_id: 'optimistic-user',
-        created_at: new Date().toISOString(),
-      };
+      // Update all cached expense queries (Daily, Weekly, Monthly, Custom) whose date range includes the new item
+      const queries = queryClient.getQueriesData<Expense[]>({ queryKey: ['expenses'] });
+      queries.forEach(([queryKey, oldData]) => {
+        if (!oldData) return;
+        const keyArr = queryKey as string[];
+        if (keyArr.length >= 4) {
+          const startStr = keyArr[2];
+          const endStr = keyArr[3];
 
-      // Optimistically update current active query
-      queryClient.setQueryData<Expense[]>(
-        ['expenses', filter, startDateStr, endDateStr],
-        (old = []) => [optimisticItem, ...old]
-      );
+          if (savedExpense.expense_date >= startStr && savedExpense.expense_date <= endStr) {
+            const updated = oldData.some((item) => item.id === savedExpense.id)
+              ? oldData
+              : [savedExpense, ...oldData].sort((a, b) =>
+                  b.expense_date.localeCompare(a.expense_date)
+                );
+            queryClient.setQueryData(queryKey, updated);
+          }
+        }
+      });
 
-      return { optimisticItem };
-    },
-    onError: (err) => {
-      console.error('Error adding expense:', err);
-    },
-    onSettled: () => {
+      // Invalidate in background for total server sync
       queryClient.invalidateQueries({ queryKey: ['expenses'] });
     },
   });
@@ -150,27 +149,13 @@ export function useExpenses() {
     onMutate: async (id: string) => {
       await queryClient.cancelQueries({ queryKey: ['expenses'] });
 
-      const previousExpenses = queryClient.getQueryData<Expense[]>([
-        'expenses',
-        filter,
-        startDateStr,
-        endDateStr,
-      ]);
-
-      queryClient.setQueryData<Expense[]>(
-        ['expenses', filter, startDateStr, endDateStr],
-        (old = []) => old.filter((item) => item.id !== id)
+      // Optimistically remove deleted expense from ALL cached expense queries (Daily, Weekly, Monthly, etc.)
+      queryClient.setQueriesData<Expense[]>(
+        { queryKey: ['expenses'] },
+        (old) => (old ? old.filter((item) => item.id !== id) : [])
       );
-
-      return { previousExpenses };
     },
-    onError: (err, id, context) => {
-      if (context?.previousExpenses) {
-        queryClient.setQueryData(
-          ['expenses', filter, startDateStr, endDateStr],
-          context.previousExpenses
-        );
-      }
+    onError: (err) => {
       console.error('Error deleting expense:', err);
     },
     onSettled: () => {
