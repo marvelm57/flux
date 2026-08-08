@@ -47,6 +47,8 @@ export const metadata: Metadata = {
   },
 };
 
+import { QueryProvider } from "@/providers/QueryProvider";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -62,7 +64,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <QueryProvider>
+          {children}
+        </QueryProvider>
       </body>
     </html>
   );
