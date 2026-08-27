@@ -1,5 +1,5 @@
 import { Expense, ExpenseInsert } from '@/lib/types';
-import { FilterType, CustomDateRange } from '@/hooks/useExpenses';
+import { FilterType, CustomDateRange, AvgCalcMode } from '@/hooks/useExpenses';
 
 export interface ViewProps {
   expenses: Expense[];
@@ -10,6 +10,7 @@ export interface ViewProps {
   setCustomDateRange: (range: CustomDateRange) => void;
   totalExpenses: number;
   weeklyTotal: number;
+  monthlyTotal: number;
   weeklyLimit: number;
   weeklyLimitStatus: {
     percentage: number;
@@ -22,6 +23,8 @@ export interface ViewProps {
   expensesByDate: Record<string, number>;
   dailyAverage: number;
   numberOfDays: number;
+  avgCalcMode: AvgCalcMode;
+  setAvgCalcMode: (mode: AvgCalcMode) => void;
   addExpense: (expense: ExpenseInsert) => Promise<void>;
   deleteExpense: (id: string) => Promise<void>;
 }

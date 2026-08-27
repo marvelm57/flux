@@ -4,10 +4,11 @@ import { useState, useMemo, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Expense, ExpenseInsert } from '@/lib/types';
 import { createClient } from '@/utils/supabase/client';
-import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, format, parseISO } from 'date-fns';
+import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, format, parseISO, differenceInCalendarDays } from 'date-fns';
 import { getWeeklyLimitStatus, WEEKLY_LIMIT } from '@/lib/budget';
 
 export type FilterType = 'daily' | 'weekly' | 'monthly' | 'custom';
+export type AvgCalcMode = 'all' | 'workdays' | 'active';
 
 export interface CustomDateRange {
   start: string;
@@ -30,6 +31,19 @@ const toDateString = (date: Date) => format(date, 'yyyy-MM-dd');
 export function useExpenses() {
   const [filter, setFilter] = useState<FilterType>('daily');
   const [customDateRange, setCustomDateRange] = useState<CustomDateRange | undefined>();
+  const [avgCalcMode, setAvgCalcMode] = useState<AvgCalcMode>(() => {
+    if (typeof window === 'undefined') return 'all';
+    const saved = localStorage.getItem('flux_avg_calc_mode');
+    if (saved === 'all' || saved === 'workdays' || saved === 'active') {
+      return saved as AvgCalcMode;
+    }
+    return 'all';
+  });
+
+  const handleSetAvgCalcMode = useCallback((mode: AvgCalcMode) => {
+    setAvgCalcMode(mode);
+    localStorage.setItem('flux_avg_calc_mode', mode);
+  }, []);
 
   const supabase = useMemo(() => createClient(), []);
   const queryClient = useQueryClient();
@@ -51,11 +65,14 @@ export function useExpenses() {
   }, [filter, customDateRange]);
 
   const weeklyRange = useMemo(() => getDateRange('weekly'), []);
+  const monthlyRange = useMemo(() => getDateRange('monthly'), []);
 
   const startDateStr = toDateString(activeDateRange.start);
   const endDateStr = toDateString(activeDateRange.end);
   const weeklyStartStr = toDateString(weeklyRange.start);
   const weeklyEndStr = toDateString(weeklyRange.end);
+  const monthlyStartStr = toDateString(monthlyRange.start);
+  const monthlyEndStr = toDateString(monthlyRange.end);
 
   // Query 1: Filtered expenses
   const {
@@ -77,7 +94,7 @@ export function useExpenses() {
     },
   });
 
-  // Query 2: Weekly expenses for budget status tracking (skip redundant DB query if filter === 'weekly')
+  // Query 2: Weekly expenses for budget status tracking
   const isWeeklyFilter = filter === 'weekly';
   const { data: separateWeeklyExpenses = [] } = useQuery<Expense[]>({
     queryKey: ['expenses', 'weekly-summary', weeklyStartStr, weeklyEndStr],
@@ -91,10 +108,28 @@ export function useExpenses() {
       if (error) throw error;
       return data ?? [];
     },
-    enabled: !isWeeklyFilter, // De-duplicate: do not run if weekly filter is active
+    enabled: !isWeeklyFilter,
+  });
+
+  // Query 3: Monthly expenses for monthly target calculations
+  const isMonthlyFilter = filter === 'monthly';
+  const { data: separateMonthlyExpenses = [] } = useQuery<Expense[]>({
+    queryKey: ['expenses', 'monthly-summary', monthlyStartStr, monthlyEndStr],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('expenses')
+        .select('id, amount, category, description, expense_date, user_id, created_at')
+        .gte('expense_date', monthlyStartStr)
+        .lte('expense_date', monthlyEndStr);
+
+      if (error) throw error;
+      return data ?? [];
+    },
+    enabled: !isMonthlyFilter,
   });
 
   const weeklyExpenses = isWeeklyFilter ? expenses : separateWeeklyExpenses;
+  const monthlyExpenses = isMonthlyFilter ? expenses : separateMonthlyExpenses;
   const loading = loadingExpenses;
 
   // Add Expense Mutation
@@ -180,14 +215,42 @@ export function useExpenses() {
   // Derived state computations
   const totalExpenses = useMemo(() => expenses.reduce((sum, e) => sum + Number(e.amount), 0), [expenses]);
   const weeklyTotal = useMemo(() => weeklyExpenses.reduce((sum, e) => sum + Number(e.amount), 0), [weeklyExpenses]);
+  const monthlyTotal = useMemo(() => monthlyExpenses.reduce((sum, e) => sum + Number(e.amount), 0), [monthlyExpenses]);
   const weeklyLimitStatus = useMemo(() => getWeeklyLimitStatus(weeklyTotal), [weeklyTotal]);
 
   const numberOfDays = useMemo(() => {
     if (filter === 'daily') return 1;
-    if (expenses.length === 0) return 0;
-    const uniqueDates = new Set(expenses.map((e) => e.expense_date));
-    return uniqueDates.size;
-  }, [filter, expenses]);
+
+    if (avgCalcMode === 'active') {
+      if (expenses.length === 0) return 0;
+      const uniqueDates = new Set(expenses.map((e) => e.expense_date));
+      return uniqueDates.size;
+    }
+
+    const { start, end } = activeDateRange;
+    const now = new Date();
+    const actualEnd = end > now ? now : end;
+
+    const startDate = startOfDay(start);
+    const endDate = startOfDay(actualEnd);
+
+    if (startDate > endDate) return 1;
+
+    if (avgCalcMode === 'workdays') {
+      let count = 0;
+      const cur = new Date(startDate);
+      while (cur <= endDate) {
+        const day = cur.getDay();
+        if (day !== 0 && day !== 6) count++;
+        cur.setDate(cur.getDate() + 1);
+      }
+      return Math.max(1, count);
+    }
+
+    // Default 'all' calendar days
+    const diffDays = differenceInCalendarDays(endDate, startDate) + 1;
+    return Math.max(1, diffDays);
+  }, [filter, expenses, activeDateRange, avgCalcMode]);
 
   const dailyAverage = useMemo(() => {
     if (numberOfDays === 0) return 0;
@@ -224,12 +287,15 @@ export function useExpenses() {
     deleteExpense,
     totalExpenses,
     weeklyTotal,
+    monthlyTotal,
     weeklyLimit: WEEKLY_LIMIT,
     weeklyLimitStatus,
     expensesByCategory,
     expensesByDate,
     dailyAverage,
     numberOfDays,
+    avgCalcMode,
+    setAvgCalcMode: handleSetAvgCalcMode,
     refetch,
   };
 }

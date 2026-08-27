@@ -10,6 +10,7 @@ import { FilterTabs } from './FilterTabs';
 import { ExpenseList } from './ExpenseList';
 import { ExpenseChart } from './ExpenseChart';
 import { AddExpenseForm } from './AddExpenseForm';
+import { MonthlyTargetTracker } from './MonthlyTargetTracker';
 import { ViewProps } from './types';
 import { formatIDR } from '@/lib/budget';
 
@@ -22,12 +23,15 @@ export function DesktopView({
   setCustomDateRange,
   totalExpenses,
   weeklyTotal,
+  monthlyTotal,
   weeklyLimit,
   weeklyLimitStatus,
   expensesByCategory,
   expensesByDate,
   dailyAverage,
   numberOfDays,
+  avgCalcMode,
+  setAvgCalcMode,
   addExpense,
   deleteExpense,
 }: ViewProps) {
@@ -48,39 +52,53 @@ export function DesktopView({
     custom: "Custom",
   };
 
-  const baseStatsCards = [
+  const modeLabels: Record<string, string> = {
+    all: 'all days',
+    workdays: 'workdays',
+    active: 'active days',
+  };
+
+  const totalSpendingCard = {
+    id: 'total-spending',
+    title: 'Total Spending',
+    value: formatIDR(totalExpenses),
+    icon: TrendingDown,
+    isDark: true,
+    isAvgCard: false,
+  };
+
+  const dailyAvgCard = {
+    id: 'daily-average',
+    title: `Daily Average (${numberOfDays} ${modeLabels[avgCalcMode]})`,
+    value: formatIDR(Math.round(dailyAverage)),
+    icon: Calculator,
+    isDark: true,
+    isAvgCard: true,
+  };
+
+  const otherStatsCards = [
     {
-      title: 'Total Spending',
-      value: formatIDR(totalExpenses),
-      icon: TrendingDown,
-      color: 'bg-neutral-900 text-white',
-    },
-    {
+      id: 'transactions',
       title: 'Transactions',
       value: expenses.length.toString(),
       icon: Receipt,
-      color: 'bg-white/40',
+      isDark: false,
+      isAvgCard: false,
     },
     {
+      id: 'categories',
       title: 'Categories',
       value: Object.keys(expensesByCategory).length.toString(),
       icon: PieChart,
-      color: 'bg-white/40',
+      isDark: false,
+      isAvgCard: false,
     },
   ];
 
-  // Add Daily Average card for weekly/monthly/custom filters
+  // Add Daily Average card at index 1 for weekly/monthly/custom filters
   const statsCards = filter !== 'daily' 
-    ? [
-        ...baseStatsCards,
-        {
-          title: `Daily Average (${numberOfDays} day${numberOfDays !== 1 ? 's' : ''})`,
-          value: formatIDR(Math.round(dailyAverage)),
-          icon: Calculator,
-          color: 'bg-white/40',
-        },
-      ]
-    : baseStatsCards;
+    ? [totalSpendingCard, dailyAvgCard, ...otherStatsCards]
+    : [totalSpendingCard, ...otherStatsCards];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-neutral-100 via-neutral-50 to-neutral-200">
@@ -163,6 +181,9 @@ export function DesktopView({
           </motion.div>
         )}
 
+        {/* Monthly Spending Target Tracker */}
+        <MonthlyTargetTracker monthlyTotal={monthlyTotal} />
+
         {/* Stats Cards */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -172,34 +193,61 @@ export function DesktopView({
         >
           {statsCards.map((stat, index) => (
             <motion.div
-              key={stat.title}
+              key={stat.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 + index * 0.05 }}
+              className="h-full"
             >
               <GlassCard
-                variant={index === 0 ? 'dark' : 'light'}
+                variant={stat.isDark ? 'dark' : 'light'}
                 padding="lg"
                 rounded="2xl"
-                className={index === 0 ? 'bg-neutral-900' : ''}
+                className={`h-full flex flex-col justify-between ${stat.isDark ? 'bg-neutral-900 text-white' : ''}`}
               >
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className={`text-sm mb-1 ${index === 0 ? 'text-neutral-400' : 'text-neutral-500'}`}>
+                    <p className={`text-xs font-medium mb-1 ${stat.isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
                       {index === 0 ? filterLabels[filter] + ' ' : ''}{stat.title}
                     </p>
                     <motion.h2
                       key={stat.value}
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      className={`text-3xl font-bold ${index === 0 ? 'text-white' : 'text-neutral-900'}`}
+                      className={`text-3xl font-bold ${stat.isDark ? 'text-white' : 'text-neutral-900'}`}
                     >
                       {stat.value}
                     </motion.h2>
                   </div>
-                  <div className={`p-3 rounded-xl ${index === 0 ? 'bg-white/10' : 'bg-neutral-900/10'}`}>
-                    <stat.icon size={20} className={index === 0 ? 'text-white' : 'text-neutral-700'} />
+                  <div className={`p-3 rounded-xl ${stat.isDark ? 'bg-white/10' : 'bg-neutral-900/10'}`}>
+                    <stat.icon size={20} className={stat.isDark ? 'text-white' : 'text-neutral-700'} />
                   </div>
+                </div>
+
+                <div className={`mt-3 pt-2 border-t ${stat.isDark ? 'border-white/10' : 'border-neutral-200/60'} flex items-center h-6 gap-1 text-xs`}>
+                  {stat.isAvgCard && (
+                    <>
+                      <span className={`${stat.isDark ? 'text-neutral-400' : 'text-neutral-500'} font-medium text-[9px] mr-1`}>Mode:</span>
+                      {(['all', 'workdays', 'active'] as const).map((mode) => (
+                        <button
+                          key={mode}
+                          type="button"
+                          onClick={() => setAvgCalcMode(mode)}
+                          className={`px-2 py-0.5 rounded-md text-[9px] font-medium transition-all ${
+                            avgCalcMode === mode
+                              ? stat.isDark
+                                ? 'bg-white text-neutral-900 shadow-xs'
+                                : 'bg-neutral-900 text-white shadow-xs'
+                              : stat.isDark
+                                ? 'bg-white/10 text-neutral-300 hover:bg-white/20'
+                                : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
+                          }`}
+                        >
+                          {mode === 'all' ? 'All Days' : mode === 'workdays' ? 'Workdays' : 'Active Days'}
+                        </button>
+                      ))}
+                    </>
+                  )}
                 </div>
               </GlassCard>
             </motion.div>

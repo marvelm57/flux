@@ -10,6 +10,7 @@ import { FilterTabs } from './FilterTabs';
 import { ExpenseList } from './ExpenseList';
 import { ExpenseChart } from './ExpenseChart';
 import { AddExpenseForm } from './AddExpenseForm';
+import { MonthlyTargetTracker } from './MonthlyTargetTracker';
 import { ViewProps } from './types';
 import { formatIDR } from '@/lib/budget';
 
@@ -22,12 +23,15 @@ export function MobileView({
   setCustomDateRange,
   totalExpenses,
   weeklyTotal,
+  monthlyTotal,
   weeklyLimit,
   weeklyLimitStatus,
   expensesByCategory,
   expensesByDate,
   dailyAverage,
   numberOfDays,
+  avgCalcMode,
+  setAvgCalcMode,
   addExpense,
   deleteExpense,
 }: ViewProps) {
@@ -105,9 +109,11 @@ export function MobileView({
             {/* Daily Average - only shown for weekly/monthly/custom */}
             {filter !== 'daily' && (
               <div className="mt-4 pt-4 border-t border-white/10">
-                <div className="flex items-center justify-between">
+                <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-neutral-400 text-xs mb-0.5">Daily Average Spending</p>
+                    <p className="text-neutral-400 text-xs mb-0.5">
+                      Daily Average ({numberOfDays} {avgCalcMode === 'all' ? 'all days' : avgCalcMode === 'workdays' ? 'workdays' : 'active days'})
+                    </p>
                     <motion.p
                       key={dailyAverage}
                       initial={{ opacity: 0, y: 5 }}
@@ -117,14 +123,33 @@ export function MobileView({
                       {formatIDR(Math.round(dailyAverage))}
                     </motion.p>
                   </div>
-                  <p className="text-neutral-500 text-xs">
-                    over {numberOfDays} day{numberOfDays !== 1 ? 's' : ''}
-                  </p>
+                </div>
+
+                <div className="mt-2.5 flex items-center gap-1.5 text-xs">
+                  <span className="text-neutral-400 text-[11px]">Mode:</span>
+                  {(['all', 'workdays', 'active'] as const).map((mode) => (
+                    <button
+                      key={mode}
+                      onClick={() => setAvgCalcMode(mode)}
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-medium transition-all ${
+                        avgCalcMode === mode
+                          ? 'bg-white text-neutral-900 font-semibold'
+                          : 'bg-white/10 text-neutral-300 hover:bg-white/20'
+                      }`}
+                    >
+                      {mode === 'all' ? 'All Days' : mode === 'workdays' ? 'Workdays' : 'Active Days'}
+                    </button>
+                  ))}
                 </div>
               </div>
             )}
           </GlassCard>
         </motion.div>
+
+        {/* Monthly Target Tracker */}
+        <div className="mt-4">
+          <MonthlyTargetTracker monthlyTotal={monthlyTotal} isMobile={true} />
+        </div>
 
         {/* Weekly Limit Warning */}
         {(weeklyLimitStatus.isWarning || weeklyLimitStatus.isExceeded) && (

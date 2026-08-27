@@ -17,12 +17,15 @@ export function BudgetTracker() {
     deleteExpense,
     totalExpenses,
     weeklyTotal,
+    monthlyTotal,
     weeklyLimit,
     weeklyLimitStatus,
     expensesByCategory,
     expensesByDate,
     dailyAverage,
     numberOfDays,
+    avgCalcMode,
+    setAvgCalcMode,
   } = useExpenses();
 
   const isMobile = useIsMobile();
@@ -36,12 +39,15 @@ export function BudgetTracker() {
     setCustomDateRange,
     totalExpenses,
     weeklyTotal,
+    monthlyTotal,
     weeklyLimit,
     weeklyLimitStatus,
     expensesByCategory,
     expensesByDate,
     dailyAverage,
     numberOfDays,
+    avgCalcMode,
+    setAvgCalcMode,
     addExpense,
     deleteExpense,
   };
