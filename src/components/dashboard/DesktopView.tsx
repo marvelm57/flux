@@ -228,13 +228,13 @@ export function DesktopView({
                 <div className={`mt-3 pt-2 border-t ${stat.isDark ? 'border-white/10' : 'border-neutral-200/60'} flex items-center h-6 gap-1 text-xs`}>
                   {stat.isAvgCard && (
                     <>
-                      <span className={`${stat.isDark ? 'text-neutral-400' : 'text-neutral-500'} font-medium text-[9px] mr-1`}>Mode:</span>
+                      <span className={`${stat.isDark ? 'text-neutral-400' : 'text-neutral-500'} font-medium text-xs mr-1`}>Mode:</span>
                       {(['all', 'workdays', 'active'] as const).map((mode) => (
                         <button
                           key={mode}
                           type="button"
                           onClick={() => setAvgCalcMode(mode)}
-                          className={`px-2 py-0.5 rounded-md text-[9px] font-medium transition-all ${
+                          className={`px-2 py-0.5 rounded-md text-xs font-medium transition-all ${
                             avgCalcMode === mode
                               ? stat.isDark
                                 ? 'bg-white text-neutral-900 shadow-xs'

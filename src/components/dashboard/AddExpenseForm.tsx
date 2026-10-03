@@ -107,7 +107,7 @@ export function AddExpenseForm({ onSubmit, isMobile }: AddExpenseFormProps) {
         
         {/* Quick Presets */}
         <div className="mt-3">
-          <span className="text-[11px] font-medium text-neutral-400 block mb-1.5">Quick Add:</span>
+          <span className="text-xs font-medium text-neutral-400 block mb-1.5">Quick Add:</span>
           <div className="flex flex-wrap items-center gap-2">
             {quickPresets.map((preset, idx) => {
               const isSelected = 
@@ -120,7 +120,7 @@ export function AddExpenseForm({ onSubmit, isMobile }: AddExpenseFormProps) {
                   key={idx}
                   type="button"
                   onClick={() => handlePresetClick(preset)}
-                  className={`shrink-0 px-2.5 py-1 rounded-full text-[10px] font-medium transition-colors border ${
+                  className={`shrink-0 px-2.5 py-1 rounded-full text-xs font-medium transition-colors border ${
                     isSelected 
                       ? 'bg-neutral-900 text-white border-neutral-900 shadow-sm' 
                       : 'bg-neutral-100/80 hover:bg-neutral-200/80 text-neutral-600 border-neutral-200/60'

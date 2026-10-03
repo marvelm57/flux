@@ -133,12 +133,12 @@ export function MonthlyTargetTracker({ monthlyTotal, projectedMonthlyTotal, avgC
         className="w-full px-5 py-3.5 flex items-center justify-between cursor-pointer hover:bg-white/20 transition-colors select-none"
       >
         <div className="flex flex-1 items-center justify-between pr-6 gap-2">
-          <span className="font-semibold text-neutral-800 text-[10px]">Monthly Spending Target</span>
+          <span className="font-semibold text-neutral-800 text-xs">Monthly Spending Target</span>
           <div className="flex flex-col text-right shrink-0">
-            <span className={`text-[10px] font-semibold whitespace-nowrap ${isOverBudget ? 'text-red-600' : 'text-emerald-700'}`}>
+            <span className={`text-xs font-semibold whitespace-nowrap ${isOverBudget ? 'text-red-600' : 'text-emerald-700'}`}>
               {isOverBudget ? `Exceeded by ${formatIDR(Math.abs(amountLeft))}` : `Remaining: ${formatIDR(amountLeft)}`} 
             </span>
-            <span className="text-[10px] font-medium text-blue-500 whitespace-nowrap">
+            <span className="text-xs font-medium text-blue-500 whitespace-nowrap">
               Projected: {formatIDR(Math.round(projectedMonthlyTotal))}
             </span>
           </div>
@@ -191,7 +191,7 @@ export function MonthlyTargetTracker({ monthlyTotal, projectedMonthlyTotal, avgC
 
                   {/* Preset Buttons */}
                   <div className="pt-2">
-                    <span className="text-[11px] font-medium text-neutral-400 mb-1.5 block">Quick Presets:</span>
+                    <span className="text-xs font-medium text-neutral-400 mb-1.5 block">Quick Presets:</span>
                     <div className="flex items-center gap-1.5 flex-wrap">
                       {[1500000, 2000000, 3000000, 3500000].map((preset) => (
                         <button
@@ -257,7 +257,7 @@ export function MonthlyTargetTracker({ monthlyTotal, projectedMonthlyTotal, avgC
                       
                       {/* Progress Bar */}
                       <div className="mt-2.5">
-                        <div className="flex justify-between text-[10px] font-medium text-neutral-500 mb-1">
+                        <div className="flex justify-between text-xs font-medium text-neutral-500 mb-1">
                           <span>Spent {formatIDR(monthlyTotal)}</span>
                           <span>{percentageSpent}%</span>
                         </div>
@@ -282,7 +282,7 @@ export function MonthlyTargetTracker({ monthlyTotal, projectedMonthlyTotal, avgC
                         </p>
                       </div>
                       
-                      <p className="text-[10px] text-neutral-500 mt-2 leading-snug">
+                      <p className="text-xs text-neutral-500 mt-2 leading-snug">
                         {isOverBudget ? (
                           <span className="text-red-600 font-medium flex items-center gap-1">
                             <AlertCircle size={10} /> Limit reached. Minimize spend.
@@ -307,7 +307,7 @@ export function MonthlyTargetTracker({ monthlyTotal, projectedMonthlyTotal, avgC
                         </p>
                       </div>
                       
-                      <p className="text-[10px] text-neutral-500 mt-2 leading-snug">
+                      <p className="text-xs text-neutral-500 mt-2 leading-snug">
                         {projectedMonthlyTotal > target ? (
                           <span className="text-amber-600 font-medium flex items-center gap-1">
                             <AlertCircle size={10} /> Projected to exceed target by {formatIDR(Math.round(projectedMonthlyTotal - target))}.

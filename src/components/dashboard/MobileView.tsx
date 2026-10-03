@@ -141,12 +141,12 @@ export function MobileView({
                 </div>
 
                 <div className="mt-2.5 flex items-center gap-1.5 text-xs">
-                  <span className="text-neutral-400 text-[11px]">Mode:</span>
+                  <span className="text-neutral-400 text-xs">Mode:</span>
                   {(['all', 'workdays', 'active'] as const).map((mode) => (
                     <button
                       key={mode}
                       onClick={() => setAvgCalcMode(mode)}
-                      className={`px-2 py-0.5 rounded-full text-[10px] font-medium transition-all ${
+                      className={`px-2 py-0.5 rounded-full text-xs font-medium transition-all ${
                         avgCalcMode === mode
                           ? 'bg-white text-neutral-900 font-semibold'
                           : 'bg-white/10 text-neutral-300 hover:bg-white/20'
