@@ -26,6 +26,8 @@ export function BudgetTracker() {
     numberOfDays,
     avgCalcMode,
     setAvgCalcMode,
+    projectedMonthlyTotal,
+    projectedDays,
   } = useExpenses();
 
   const isMobile = useIsMobile();
@@ -48,6 +50,8 @@ export function BudgetTracker() {
     numberOfDays,
     avgCalcMode,
     setAvgCalcMode,
+    projectedMonthlyTotal,
+    projectedDays,
     addExpense,
     deleteExpense,
   };

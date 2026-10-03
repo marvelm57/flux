@@ -276,6 +276,42 @@ export function useExpenses() {
     [expenses]
   );
 
+  const { projectedMonthlyTotal, projectedDays } = useMemo(() => {
+    const now = new Date();
+    const start = startOfMonth(now);
+    const end = endOfMonth(now);
+    
+    let daysPassed = 0;
+    let totalDays = 0;
+
+    if (avgCalcMode === 'active') {
+      const uniqueDates = new Set(monthlyExpenses.filter(e => new Date(e.expense_date) <= now).map((e) => e.expense_date));
+      daysPassed = uniqueDates.size;
+      const allDaysPassed = differenceInCalendarDays(now, start) + 1;
+      const totalAllDays = differenceInCalendarDays(end, start) + 1;
+      totalDays = allDaysPassed > 0 ? (daysPassed / allDaysPassed) * totalAllDays : 0;
+    } else if (avgCalcMode === 'workdays') {
+      const endDate = now > end ? end : now;
+      for (let d = new Date(start); d <= endDate; d.setDate(d.getDate() + 1)) {
+        if (d.getDay() !== 0 && d.getDay() !== 6) daysPassed++;
+      }
+      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+        if (d.getDay() !== 0 && d.getDay() !== 6) totalDays++;
+      }
+    } else {
+      const endDate = now > end ? end : now;
+      daysPassed = Math.max(1, differenceInCalendarDays(endDate, start) + 1);
+      totalDays = differenceInCalendarDays(end, start) + 1;
+    }
+
+    if (daysPassed === 0) return { projectedMonthlyTotal: 0, projectedDays: Math.round(totalDays) };
+    const average = monthlyTotal / daysPassed;
+    return {
+      projectedMonthlyTotal: average * totalDays,
+      projectedDays: Math.round(totalDays)
+    };
+  }, [monthlyExpenses, monthlyTotal, avgCalcMode]);
+
   return {
     expenses,
     loading,
@@ -296,6 +332,8 @@ export function useExpenses() {
     numberOfDays,
     avgCalcMode,
     setAvgCalcMode: handleSetAvgCalcMode,
+    projectedMonthlyTotal,
+    projectedDays,
     refetch,
   };
 }

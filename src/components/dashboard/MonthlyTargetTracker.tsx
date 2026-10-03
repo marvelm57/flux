@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, AlertCircle } from 'lucide-react';
 import { GlassCard } from '../ui/GlassComponents';
@@ -8,13 +8,15 @@ import { formatIDR } from '@/lib/budget';
 
 interface MonthlyTargetTrackerProps {
   monthlyTotal: number;
+  projectedMonthlyTotal: number;
+  avgCalcMode?: 'all' | 'workdays' | 'active';
+  setAvgCalcMode?: (mode: 'all' | 'workdays' | 'active') => void;
   isMobile?: boolean;
 }
 
 export type CalcMode = 'all' | 'workdays';
 
 const STORAGE_KEY_TARGET = 'flux_monthly_spending_target';
-const STORAGE_KEY_MODE = 'flux_monthly_target_mode';
 const DEFAULT_TARGET = 5000000;
 
 // Format number with thousand separators (e.g. 5,000,000)
@@ -41,6 +43,7 @@ function getRemainingAllDaysInMonth(now = new Date()): number {
   return totalDays - now.getDate() + 1;
 }
 
+
 // Helper: remaining workdays (Mon-Fri, inclusive of today)
 function getRemainingWorkdaysInMonth(now = new Date()): number {
   const year = now.getFullYear();
@@ -58,7 +61,8 @@ function getRemainingWorkdaysInMonth(now = new Date()): number {
   return count;
 }
 
-export function MonthlyTargetTracker({ monthlyTotal }: MonthlyTargetTrackerProps) {
+export function MonthlyTargetTracker({ monthlyTotal, projectedMonthlyTotal, avgCalcMode = 'all', setAvgCalcMode }: MonthlyTargetTrackerProps) {
+  const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
   const [target, setTarget] = useState<number>(() => {
@@ -69,15 +73,6 @@ export function MonthlyTargetTracker({ monthlyTotal }: MonthlyTargetTrackerProps
       if (!isNaN(parsed) && parsed > 0) return parsed;
     }
     return DEFAULT_TARGET;
-  });
-
-  const [mode, setMode] = useState<CalcMode>(() => {
-    if (typeof window === 'undefined') return 'all';
-    const savedMode = localStorage.getItem(STORAGE_KEY_MODE);
-    if (savedMode === 'all' || savedMode === 'workdays') {
-      return savedMode;
-    }
-    return 'all';
   });
 
   const [inputValue, setInputValue] = useState<string>(() => {
@@ -109,15 +104,25 @@ export function MonthlyTargetTracker({ monthlyTotal }: MonthlyTargetTrackerProps
   };
 
   const handleModeChange = (newMode: CalcMode) => {
-    setMode(newMode);
-    localStorage.setItem(STORAGE_KEY_MODE, newMode);
+    if (setAvgCalcMode) {
+      setAvgCalcMode(newMode);
+    }
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null; // Prevent hydration error
+  }
 
   const amountLeft = target - monthlyTotal;
   const isOverBudget = amountLeft < 0;
   const percentageSpent = target > 0 ? Math.min(100, Math.round((monthlyTotal / target) * 100)) : 0;
 
-  const remainingDays = mode === 'all' ? getRemainingAllDaysInMonth() : getRemainingWorkdaysInMonth();
+  const remainingDays = avgCalcMode === 'workdays' ? getRemainingWorkdaysInMonth() : getRemainingAllDaysInMonth();
   const remainingDailyLimit = remainingDays > 0 ? Math.max(0, amountLeft) / remainingDays : 0;
 
   return (
@@ -127,11 +132,16 @@ export function MonthlyTargetTracker({ monthlyTotal }: MonthlyTargetTrackerProps
         onClick={() => setIsOpen(!isOpen)}
         className="w-full px-5 py-3.5 flex items-center justify-between cursor-pointer hover:bg-white/20 transition-colors select-none"
       >
-        <div className="flex items-center gap-3">
-          <span className="font-semibold text-neutral-800 text-xs">Monthly Spending Target</span>
-          <span className={`text-xs font-semibold ${isOverBudget ? 'text-red-600' : 'text-emerald-700'}`}>
-            {isOverBudget ? `Exceeded by ${formatIDR(Math.abs(amountLeft))}` : `Remaining: ${formatIDR(amountLeft)}`}
-          </span>
+        <div className="flex flex-1 items-center justify-between pr-6 gap-2">
+          <span className="font-semibold text-neutral-800 text-[10px]">Monthly Spending Target</span>
+          <div className="flex flex-col text-right shrink-0">
+            <span className={`text-[10px] font-semibold whitespace-nowrap ${isOverBudget ? 'text-red-600' : 'text-emerald-700'}`}>
+              {isOverBudget ? `Exceeded by ${formatIDR(Math.abs(amountLeft))}` : `Remaining: ${formatIDR(amountLeft)}`} 
+            </span>
+            <span className="text-[10px] font-medium text-blue-500 whitespace-nowrap">
+              Projected: {formatIDR(Math.round(projectedMonthlyTotal))}
+            </span>
+          </div>
         </div>
 
         <div className="flex items-center gap-2 text-neutral-500">
@@ -211,7 +221,7 @@ export function MonthlyTargetTracker({ monthlyTotal }: MonthlyTargetTrackerProps
                         type="button"
                         onClick={() => handleModeChange('all')}
                         className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
-                          mode === 'all'
+                          avgCalcMode === 'all' || avgCalcMode === 'active'
                             ? 'bg-neutral-900 text-white shadow-xs'
                             : 'bg-neutral-100/80 text-neutral-600 hover:bg-neutral-200/80'
                         }`}
@@ -222,7 +232,7 @@ export function MonthlyTargetTracker({ monthlyTotal }: MonthlyTargetTrackerProps
                         type="button"
                         onClick={() => handleModeChange('workdays')}
                         className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
-                          mode === 'workdays'
+                          avgCalcMode === 'workdays'
                             ? 'bg-neutral-900 text-white shadow-xs'
                             : 'bg-neutral-100/80 text-neutral-600 hover:bg-neutral-200/80'
                         }`}
@@ -233,15 +243,17 @@ export function MonthlyTargetTracker({ monthlyTotal }: MonthlyTargetTrackerProps
                   </div>
 
                   {/* Cards Grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     {/* Amount Left Card */}
-                    <div className={`p-4 rounded-xl border ${isOverBudget ? 'bg-red-50/80 border-red-200' : 'bg-emerald-50/80 border-emerald-200/80'}`}>
-                      <span className={`text-xs font-semibold ${isOverBudget ? 'text-red-700' : 'text-emerald-700'}`}>
-                        {isOverBudget ? 'Target Exceeded By' : 'Remaining Budget'}
-                      </span>
-                      <p className={`text-2xl font-bold mt-1 ${isOverBudget ? 'text-red-700' : 'text-emerald-800'}`}>
-                        {formatIDR(Math.abs(amountLeft))}
-                      </p>
+                    <div className={`p-4 rounded-xl border flex flex-col justify-between ${isOverBudget ? 'bg-red-50/80 border-red-200' : 'bg-emerald-50/80 border-emerald-200/80'}`}>
+                      <div>
+                        <span className={`text-xs font-semibold ${isOverBudget ? 'text-red-700' : 'text-emerald-700'}`}>
+                          {isOverBudget ? 'Target Exceeded By' : 'Remaining Budget'}
+                        </span>
+                        <p className={`text-xl font-bold mt-1 ${isOverBudget ? 'text-red-700' : 'text-emerald-800'}`}>
+                          {formatIDR(Math.abs(amountLeft))}
+                        </p>
+                      </div>
                       
                       {/* Progress Bar */}
                       <div className="mt-2.5">
@@ -264,22 +276,46 @@ export function MonthlyTargetTracker({ monthlyTotal }: MonthlyTargetTrackerProps
                     <div className="p-4 rounded-xl bg-white/70 border border-neutral-200/80 flex flex-col justify-between">
                       <div>
                         <span className="text-xs font-semibold text-neutral-700">Recommended Daily Limit</span>
-                        <p className="text-2xl font-bold text-neutral-900 mt-1">
+                        <p className="text-xl font-bold text-neutral-900 mt-1">
                           {formatIDR(Math.round(remainingDailyLimit))}
                           <span className="text-xs font-normal text-neutral-500">/day</span>
                         </p>
                       </div>
                       
-                      <p className="text-xs text-neutral-500 mt-2">
+                      <p className="text-[10px] text-neutral-500 mt-2 leading-snug">
                         {isOverBudget ? (
                           <span className="text-red-600 font-medium flex items-center gap-1">
-                            <AlertCircle size={12} /> Target reached. Try minimizing further spend.
+                            <AlertCircle size={10} /> Limit reached. Minimize spend.
                           </span>
                         ) : (
                           <>
                             to spend per day for remaining{' '}
-                            <strong className="font-semibold text-neutral-800">{remainingDays} {mode === 'all' ? 'days' : 'workdays'}</strong>.
+                            <strong className="font-semibold text-neutral-800">{remainingDays} {avgCalcMode === 'workdays' ? 'workdays' : 'days'}</strong>.
                           </>
+                        )}
+                      </p>
+                    </div>
+
+                    {/* Projected Card */}
+                    <div className={`p-4 rounded-xl border flex flex-col justify-between ${projectedMonthlyTotal > target ? 'bg-amber-50/80 border-amber-200/80' : 'bg-blue-50/80 border-blue-200/80'}`}>
+                      <div>
+                        <span className={`text-xs font-semibold ${projectedMonthlyTotal > target ? 'text-amber-700' : 'text-blue-700'}`}>
+                          Projected Total
+                        </span>
+                        <p className={`text-xl font-bold mt-1 ${projectedMonthlyTotal > target ? 'text-amber-800' : 'text-blue-800'}`}>
+                          {formatIDR(Math.round(projectedMonthlyTotal))}
+                        </p>
+                      </div>
+                      
+                      <p className="text-[10px] text-neutral-500 mt-2 leading-snug">
+                        {projectedMonthlyTotal > target ? (
+                          <span className="text-amber-600 font-medium flex items-center gap-1">
+                            <AlertCircle size={10} /> Projected to exceed target by {formatIDR(Math.round(projectedMonthlyTotal - target))}.
+                          </span>
+                        ) : (
+                          <span className="text-blue-600 font-medium flex items-center gap-1">
+                            Projected to be under target by {formatIDR(Math.round(target - projectedMonthlyTotal))}.
+                          </span>
                         )}
                       </p>
                     </div>

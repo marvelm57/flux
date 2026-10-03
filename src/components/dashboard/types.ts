@@ -23,8 +23,10 @@ export interface ViewProps {
   expensesByDate: Record<string, number>;
   dailyAverage: number;
   numberOfDays: number;
+  projectedDays: number;
   avgCalcMode: AvgCalcMode;
   setAvgCalcMode: (mode: AvgCalcMode) => void;
+  projectedMonthlyTotal: number;
   addExpense: (expense: ExpenseInsert) => Promise<void>;
   deleteExpense: (id: string) => Promise<void>;
 }

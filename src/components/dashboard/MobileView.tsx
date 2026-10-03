@@ -34,6 +34,8 @@ export function MobileView({
   setAvgCalcMode,
   addExpense,
   deleteExpense,
+  projectedMonthlyTotal,
+  projectedDays,
 }: ViewProps) {
   const router = useRouter();
   const [loggingOut, setLoggingOut] = useState(false);
@@ -109,7 +111,7 @@ export function MobileView({
             {/* Daily Average - only shown for weekly/monthly/custom */}
             {filter !== 'daily' && (
               <div className="mt-4 pt-4 border-t border-white/10">
-                <div className="flex items-start justify-between">
+                <div className="flex flex-col gap-3">
                   <div>
                     <p className="text-neutral-400 text-xs mb-0.5">
                       Daily Average ({numberOfDays} {avgCalcMode === 'all' ? 'all days' : avgCalcMode === 'workdays' ? 'workdays' : 'active days'})
@@ -121,6 +123,19 @@ export function MobileView({
                       className="text-lg font-semibold text-white"
                     >
                       {formatIDR(Math.round(dailyAverage))}
+                    </motion.p>
+                  </div>
+                  <div>
+                    <p className="text-neutral-400 text-xs mb-0.5">
+                      Projected Monthly ({projectedDays} {avgCalcMode === 'all' ? 'all days' : avgCalcMode === 'workdays' ? 'workdays' : 'active days'})
+                    </p>
+                    <motion.p
+                      key={projectedMonthlyTotal}
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="text-lg font-semibold text-white"
+                    >
+                      {formatIDR(Math.round(projectedMonthlyTotal))}
                     </motion.p>
                   </div>
                 </div>
@@ -148,7 +163,7 @@ export function MobileView({
 
         {/* Monthly Target Tracker */}
         <div className="mt-4">
-          <MonthlyTargetTracker monthlyTotal={monthlyTotal} isMobile={true} />
+          <MonthlyTargetTracker monthlyTotal={monthlyTotal} projectedMonthlyTotal={projectedMonthlyTotal} avgCalcMode={avgCalcMode} setAvgCalcMode={setAvgCalcMode} isMobile={true} />
         </div>
 
         {/* Weekly Limit Warning */}
