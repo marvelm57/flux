@@ -34,6 +34,8 @@ export function DesktopView({
   setAvgCalcMode,
   addExpense,
   deleteExpense,
+  projectionDailyAmount,
+  setProjectionDailyAmount,
   projectedMonthlyTotal,
 }: ViewProps) {
   const router = useRouter();
@@ -183,7 +185,14 @@ export function DesktopView({
         )}
 
         {/* Monthly Spending Target Tracker */}
-        <MonthlyTargetTracker monthlyTotal={monthlyTotal} projectedMonthlyTotal={projectedMonthlyTotal} avgCalcMode={avgCalcMode} setAvgCalcMode={setAvgCalcMode} />
+        <MonthlyTargetTracker 
+          monthlyTotal={monthlyTotal} 
+          projectedMonthlyTotal={projectedMonthlyTotal} 
+          avgCalcMode={avgCalcMode} 
+          setAvgCalcMode={setAvgCalcMode} 
+          projectionDailyAmount={projectionDailyAmount}
+          setProjectionDailyAmount={setProjectionDailyAmount}
+        />
 
         {/* Stats Cards */}
         <motion.div

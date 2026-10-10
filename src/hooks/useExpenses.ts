@@ -45,6 +45,22 @@ export function useExpenses() {
     localStorage.setItem('flux_avg_calc_mode', mode);
   }, []);
 
+  const [projectionDailyAmount, setProjectionDailyAmount] = useState<number | null>(() => {
+    if (typeof window === 'undefined') return null;
+    const saved = localStorage.getItem('flux_projection_daily_amount');
+    if (saved) return Number(saved);
+    return null;
+  });
+
+  const handleSetProjectionDailyAmount = useCallback((amount: number | null) => {
+    setProjectionDailyAmount(amount);
+    if (amount === null) {
+      localStorage.removeItem('flux_projection_daily_amount');
+    } else {
+      localStorage.setItem('flux_projection_daily_amount', amount.toString());
+    }
+  }, []);
+
   const supabase = useMemo(() => createClient(), []);
   const queryClient = useQueryClient();
 
@@ -276,7 +292,7 @@ export function useExpenses() {
     [expenses]
   );
 
-  const { projectedMonthlyTotal, projectedDays } = useMemo(() => {
+  const { projectedMonthlyTotal, projectedDays, computedProjectionDailyAmount } = useMemo(() => {
     const now = new Date();
     const start = startOfMonth(now);
     const end = endOfMonth(now);
@@ -304,13 +320,18 @@ export function useExpenses() {
       totalDays = differenceInCalendarDays(end, start) + 1;
     }
 
-    if (daysPassed === 0) return { projectedMonthlyTotal: 0, projectedDays: Math.round(totalDays) };
-    const average = monthlyTotal / daysPassed;
+    const remainingDays = Math.max(0, totalDays - daysPassed);
+    const average = daysPassed > 0 ? monthlyTotal / daysPassed : 0;
+    const effectiveAmount = projectionDailyAmount !== null ? projectionDailyAmount : average;
+
+    if (daysPassed === 0 && remainingDays === 0) return { projectedMonthlyTotal: 0, projectedDays: Math.round(totalDays), computedProjectionDailyAmount: effectiveAmount };
+
     return {
-      projectedMonthlyTotal: average * totalDays,
-      projectedDays: Math.round(totalDays)
+      projectedMonthlyTotal: monthlyTotal + (remainingDays * effectiveAmount),
+      projectedDays: Math.round(totalDays),
+      computedProjectionDailyAmount: effectiveAmount
     };
-  }, [monthlyExpenses, monthlyTotal, avgCalcMode]);
+  }, [monthlyExpenses, monthlyTotal, avgCalcMode, projectionDailyAmount]);
 
   return {
     expenses,
@@ -332,6 +353,8 @@ export function useExpenses() {
     numberOfDays,
     avgCalcMode,
     setAvgCalcMode: handleSetAvgCalcMode,
+    projectionDailyAmount: computedProjectionDailyAmount,
+    setProjectionDailyAmount: handleSetProjectionDailyAmount,
     projectedMonthlyTotal,
     projectedDays,
     refetch,

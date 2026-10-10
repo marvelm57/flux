@@ -26,6 +26,8 @@ export function BudgetTracker() {
     numberOfDays,
     avgCalcMode,
     setAvgCalcMode,
+    projectionDailyAmount,
+    setProjectionDailyAmount,
     projectedMonthlyTotal,
     projectedDays,
   } = useExpenses();
@@ -50,6 +52,8 @@ export function BudgetTracker() {
     numberOfDays,
     avgCalcMode,
     setAvgCalcMode,
+    projectionDailyAmount,
+    setProjectionDailyAmount,
     projectedMonthlyTotal,
     projectedDays,
     addExpense,

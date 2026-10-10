@@ -24,6 +24,8 @@ export interface ViewProps {
   dailyAverage: number;
   numberOfDays: number;
   projectedDays: number;
+  projectionDailyAmount: number;
+  setProjectionDailyAmount: (amount: number | null) => void;
   avgCalcMode: AvgCalcMode;
   setAvgCalcMode: (mode: AvgCalcMode) => void;
   projectedMonthlyTotal: number;

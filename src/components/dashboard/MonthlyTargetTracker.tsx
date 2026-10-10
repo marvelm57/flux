@@ -11,6 +11,8 @@ interface MonthlyTargetTrackerProps {
   projectedMonthlyTotal: number;
   avgCalcMode?: 'all' | 'workdays' | 'active';
   setAvgCalcMode?: (mode: 'all' | 'workdays' | 'active') => void;
+  projectionDailyAmount?: number;
+  setProjectionDailyAmount?: (amount: number | null) => void;
   isMobile?: boolean;
 }
 
@@ -61,7 +63,15 @@ function getRemainingWorkdaysInMonth(now = new Date()): number {
   return count;
 }
 
-export function MonthlyTargetTracker({ monthlyTotal, projectedMonthlyTotal, avgCalcMode = 'all', setAvgCalcMode }: MonthlyTargetTrackerProps) {
+export function MonthlyTargetTracker({ 
+  monthlyTotal, 
+  projectedMonthlyTotal, 
+  avgCalcMode = 'all', 
+  setAvgCalcMode,
+  projectionDailyAmount = 50000,
+  setProjectionDailyAmount,
+  isMobile 
+}: MonthlyTargetTrackerProps) {
   const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -320,6 +330,38 @@ export function MonthlyTargetTracker({ monthlyTotal, projectedMonthlyTotal, avgC
                       </p>
                     </div>
                   </div>
+
+                  {/* Projection Slider */}
+                  {setProjectionDailyAmount && (
+                    <div className="mt-4 p-4 rounded-xl border border-neutral-200/80 bg-white/70">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-semibold text-neutral-700">Daily Amount for Projection (remaining {remainingDays} {avgCalcMode === 'workdays' ? 'workdays' : 'days'})</span>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setProjectionDailyAmount(null)}
+                            className="text-[10px] font-medium text-neutral-500 hover:text-neutral-900 bg-neutral-100 hover:bg-neutral-200 px-2 py-0.5 rounded transition-colors"
+                          >
+                            Reset
+                          </button>
+                          <span className="text-sm font-bold text-neutral-900">{formatIDR(projectionDailyAmount)}</span>
+                        </div>
+                      </div>
+                      <input 
+                        type="range" 
+                        min="0" 
+                        max="100000" 
+                        step="1000"
+                        value={projectionDailyAmount}
+                        onChange={(e) => setProjectionDailyAmount(Number(e.target.value))}
+                        className="w-full h-2 bg-neutral-200 rounded-lg appearance-none cursor-pointer accent-neutral-800"
+                      />
+                      <div className="flex justify-between mt-1 text-[10px] text-neutral-400 font-medium">
+                        <span>Rp 0</span>
+                        <span>Rp 100,000+</span>
+                      </div>
+                    </div>
+                  )}
 
                 </div>
 

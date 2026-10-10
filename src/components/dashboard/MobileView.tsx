@@ -34,6 +34,8 @@ export function MobileView({
   setAvgCalcMode,
   addExpense,
   deleteExpense,
+  projectionDailyAmount,
+  setProjectionDailyAmount,
   projectedMonthlyTotal,
   projectedDays,
 }: ViewProps) {
@@ -163,7 +165,15 @@ export function MobileView({
 
         {/* Monthly Target Tracker */}
         <div className="mt-4">
-          <MonthlyTargetTracker monthlyTotal={monthlyTotal} projectedMonthlyTotal={projectedMonthlyTotal} avgCalcMode={avgCalcMode} setAvgCalcMode={setAvgCalcMode} isMobile={true} />
+          <MonthlyTargetTracker 
+            monthlyTotal={monthlyTotal} 
+            projectedMonthlyTotal={projectedMonthlyTotal} 
+            avgCalcMode={avgCalcMode} 
+            setAvgCalcMode={setAvgCalcMode} 
+            projectionDailyAmount={projectionDailyAmount}
+            setProjectionDailyAmount={setProjectionDailyAmount}
+            isMobile={true} 
+          />
         </div>
 
         {/* Weekly Limit Warning */}
