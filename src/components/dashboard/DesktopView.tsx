@@ -1,13 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Wallet, TrendingDown, Receipt, PieChart, AlertTriangle, LogOut, Calculator } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { GlassCard } from '../ui/GlassComponents';
 import { FilterTabs } from './FilterTabs';
-import { ExpenseList } from './ExpenseList';
+import { ExpenseList, filterExpenses } from './ExpenseList';
+import { ExpenseToolbar } from './ExpenseToolbar';
 import { ExpenseChart } from './ExpenseChart';
 import { AddExpenseForm } from './AddExpenseForm';
 import { MonthlyTargetTracker } from './MonthlyTargetTracker';
@@ -46,6 +47,16 @@ export function DesktopView({
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+
+  const filteredExpenses = useMemo(() => {
+    return filterExpenses(expenses, searchQuery, selectedCategory);
+  }, [expenses, searchQuery, selectedCategory]);
+
+  const filteredTotal = useMemo(() => {
+    return filteredExpenses.reduce((sum, e) => sum + Number(e.amount), 0);
+  }, [filteredExpenses]);
 
   const handleLogout = async () => {
     setLoggingOut(true);
@@ -288,7 +299,22 @@ export function DesktopView({
           />
         </motion.div>
 
-        {/* Expense List */}
+        {/* Sticky Search Toolbar on top of Recent Transactions Card */}
+        {expenses.length > 0 && (
+          <div className="sticky top-4 z-20 mb-4">
+            <ExpenseToolbar
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              selectedCategory={selectedCategory}
+              onCategoryChange={setSelectedCategory}
+              filteredCount={filteredExpenses.length}
+              totalCount={expenses.length}
+              filteredTotal={filteredTotal}
+            />
+          </div>
+        )}
+
+        {/* Expense List Card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -297,7 +323,9 @@ export function DesktopView({
           <GlassCard variant="light" padding="lg" rounded="2xl">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-semibold text-neutral-800">Recent Transactions</h3>
-              <span className="text-sm text-neutral-500">{expenses.length} items</span>
+              <span className="text-sm text-neutral-500">
+                {filteredExpenses.length} {filteredExpenses.length === 1 ? 'item' : 'items'}
+              </span>
             </div>
             
             {loading ? (
@@ -311,6 +339,11 @@ export function DesktopView({
             ) : (
               <ExpenseList
                 expenses={expenses}
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                selectedCategory={selectedCategory}
+                onCategoryChange={setSelectedCategory}
+                hideToolbar={true}
                 onDelete={deleteExpense}
                 onEdit={(expense) => {
                   setEditingExpense(expense);
