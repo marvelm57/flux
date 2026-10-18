@@ -32,7 +32,7 @@ export function ExpenseToolbar({
     <div className={`space-y-2.5 bg-white/80 backdrop-blur-xl border border-white/70 p-3 rounded-2xl shadow-sm shadow-neutral-200/60 transition-all ${className}`}>
       {/* Search Input */}
       <div className="relative flex-1">
-        <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none" />
+        <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-900 pointer-events-none" />
         <input
           type="text"
           value={searchQuery}

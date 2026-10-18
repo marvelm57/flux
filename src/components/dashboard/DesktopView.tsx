@@ -301,7 +301,7 @@ export function DesktopView({
 
         {/* Sticky Search Toolbar on top of Recent Transactions Card */}
         {expenses.length > 0 && (
-          <div className="sticky top-4 z-20 mb-4">
+          <div className="sticky top-8 z-20 mb-4">
             <ExpenseToolbar
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}

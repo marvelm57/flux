@@ -148,7 +148,7 @@ export function ExpenseList({
           filteredCount={filteredExpenses.length}
           totalCount={expenses.length}
           filteredTotal={filteredTotal}
-          className="sticky top-4 z-20"
+          className="sticky top-16 sm:top-8 z-20"
         />
       )}
 
