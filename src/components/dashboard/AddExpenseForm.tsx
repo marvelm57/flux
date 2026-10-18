@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, FileText, Calendar as CalendarIcon } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
@@ -8,7 +8,7 @@ import { BottomSheet, Modal } from '../ui/Overlays';
 import { Calendar } from '../ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { categories, Category } from '@/lib/categories';
-import { ExpenseInsert } from '@/lib/types';
+import { Expense, ExpenseInsert } from '@/lib/types';
 
 // IDR currency icon component
 const RupiahIcon = ({ size = 18 }: { size?: number }) => (
@@ -33,17 +33,50 @@ const parseFormattedNumber = (value: string): number => {
 
 interface AddExpenseFormProps {
   onSubmit: (expense: ExpenseInsert) => Promise<void>;
+  onUpdate?: (id: string, expense: ExpenseInsert) => Promise<void>;
+  initialExpense?: Expense | null;
+  isOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  onAddClick?: () => void;
   isMobile: boolean;
 }
 
-export function AddExpenseForm({ onSubmit, isMobile }: AddExpenseFormProps) {
-  const [isOpen, setIsOpen] = useState(false);
+export function AddExpenseForm({
+  onSubmit,
+  onUpdate,
+  initialExpense,
+  isOpen: controlledIsOpen,
+  onOpenChange,
+  onAddClick,
+  isMobile,
+}: AddExpenseFormProps) {
+  const isControlled = controlledIsOpen !== undefined;
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
+  const isOpen = isControlled ? controlledIsOpen : internalIsOpen;
+
   const [isDateOpen, setIsDateOpen] = useState(false);
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
   const [expenseDate, setExpenseDate] = useState(getTodayDate);
   const [selectedCategory, setSelectedCategory] = useState<Category>(categories[0]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const isEditing = Boolean(initialExpense);
+
+  useEffect(() => {
+    if (initialExpense) {
+      setAmount(formatWithThousandSeparator(initialExpense.amount.toString()));
+      setDescription(initialExpense.description || '');
+      setExpenseDate(initialExpense.expense_date);
+      const category = categories.find((c) => c.id === initialExpense.category) || categories[0];
+      setSelectedCategory(category);
+    } else if (isOpen) {
+      setAmount('');
+      setDescription('');
+      setExpenseDate(getTodayDate());
+      setSelectedCategory(categories[0]);
+    }
+  }, [initialExpense, isOpen]);
 
   const quickPresets = [
     { amount: 3000, categoryId: 'transport', description: 'KRL' },
@@ -66,21 +99,35 @@ export function AddExpenseForm({ onSubmit, isMobile }: AddExpenseFormProps) {
     setSelectedCategory(categories[0]);
   };
 
+  const handleClose = () => {
+    if (isControlled) {
+      onOpenChange?.(false);
+    } else {
+      setInternalIsOpen(false);
+    }
+    resetForm();
+  };
+
   const handleSubmit = async () => {
     if (!amount || parseFormattedNumber(amount) <= 0) return;
 
     setIsSubmitting(true);
     try {
-      await onSubmit({
+      const expenseData: ExpenseInsert = {
         amount: parseFormattedNumber(amount),
         category: selectedCategory.id,
         description: description || selectedCategory.name,
         expense_date: expenseDate,
-      });
-      resetForm();
-      setIsOpen(false);
+      };
+
+      if (initialExpense && onUpdate) {
+        await onUpdate(initialExpense.id, expenseData);
+      } else {
+        await onSubmit(expenseData);
+      }
+      handleClose();
     } catch (error) {
-      console.error('Failed to add expense:', error);
+      console.error(isEditing ? 'Failed to update expense:' : 'Failed to add expense:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -105,33 +152,35 @@ export function AddExpenseForm({ onSubmit, isMobile }: AddExpenseFormProps) {
           />
         </div>
         
-        {/* Quick Presets */}
-        <div className="mt-3">
-          <span className="text-xs font-medium text-neutral-400 block mb-1.5">Quick Add:</span>
-          <div className="flex flex-wrap items-center gap-2">
-            {quickPresets.map((preset, idx) => {
-              const isSelected = 
-                amount === formatWithThousandSeparator(preset.amount.toString()) && 
-                description === preset.description && 
-                selectedCategory.id === preset.categoryId;
-                
-              return (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => handlePresetClick(preset)}
-                  className={`shrink-0 px-2.5 py-1 rounded-full text-xs font-medium transition-colors border ${
-                    isSelected 
-                      ? 'bg-neutral-900 text-white border-neutral-900 shadow-sm' 
-                      : 'bg-neutral-100/80 hover:bg-neutral-200/80 text-neutral-600 border-neutral-200/60'
-                  }`}
-                >
-                  {preset.description}
-                </button>
-              );
-            })}
+        {/* Quick Presets - only show when creating new expense */}
+        {!isEditing && (
+          <div className="mt-3">
+            <span className="text-xs font-medium text-neutral-400 block mb-1.5">Quick Add:</span>
+            <div className="flex flex-wrap items-center gap-2">
+              {quickPresets.map((preset, idx) => {
+                const isSelected = 
+                  amount === formatWithThousandSeparator(preset.amount.toString()) && 
+                  description === preset.description && 
+                  selectedCategory.id === preset.categoryId;
+                  
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => handlePresetClick(preset)}
+                    className={`shrink-0 px-2.5 py-1 rounded-full text-xs font-medium transition-colors border ${
+                      isSelected 
+                        ? 'bg-neutral-900 text-white border-neutral-900 shadow-sm' 
+                        : 'bg-neutral-100/80 hover:bg-neutral-200/80 text-neutral-600 border-neutral-200/60'
+                    }`}
+                  >
+                    {preset.description}
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Category Selection */}
@@ -219,7 +268,7 @@ export function AddExpenseForm({ onSubmit, isMobile }: AddExpenseFormProps) {
             className="h-5 w-5 rounded-full border-2 border-white/30 border-t-white"
           />
         ) : (
-          'Add Expense'
+          isEditing ? 'Save Changes' : 'Add Expense'
         )}
       </button>
     </div>
@@ -236,11 +285,21 @@ export function AddExpenseForm({ onSubmit, isMobile }: AddExpenseFormProps) {
       >
         <button
           type="button"
-          onClick={() => setIsOpen(true)}
+          onClick={() => {
+            if (onAddClick) {
+              onAddClick();
+            } else if (isControlled) {
+              onOpenChange?.(true);
+            } else {
+              resetForm();
+              setInternalIsOpen(true);
+            }
+          }}
           className={`
             flex items-center justify-center rounded-full bg-neutral-900 text-white shadow-lg shadow-neutral-900/20 transition-colors duration-200 hover:bg-neutral-800
             ${isMobile ? 'h-14 w-14' : 'h-16 w-16'}
           `}
+          aria-label="Add expense"
         >
           <Plus size={isMobile ? 24 : 28} />
         </button>
@@ -250,8 +309,8 @@ export function AddExpenseForm({ onSubmit, isMobile }: AddExpenseFormProps) {
       {isMobile ? (
         <BottomSheet
           isOpen={isOpen}
-          onClose={() => setIsOpen(false)}
-          title="Add Expense"
+          onClose={handleClose}
+          title={isEditing ? 'Edit Expense' : 'Add Expense'}
           cardClassName="bg-white/60 border border-white/50 shadow-xl shadow-neutral-200/50 backdrop-blur-xl"
         >
           {formContent}
@@ -259,8 +318,8 @@ export function AddExpenseForm({ onSubmit, isMobile }: AddExpenseFormProps) {
       ) : (
         <Modal
           isOpen={isOpen}
-          onClose={() => setIsOpen(false)}
-          title="Add Expense"
+          onClose={handleClose}
+          title={isEditing ? 'Edit Expense' : 'Add Expense'}
           cardClassName="bg-white/60 border border-white/50 shadow-xl shadow-neutral-200/50 backdrop-blur-xl"
         >
           {formContent}

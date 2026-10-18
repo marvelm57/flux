@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Trash2, ChevronDown } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { GlassCard } from '../ui/GlassComponents';
+import { Modal } from '../ui/Overlays';
 import { Expense } from '@/lib/types';
 import { getCategoryById } from '@/lib/categories';
 import { formatIDR } from '@/lib/budget';
@@ -12,13 +13,29 @@ import { formatIDR } from '@/lib/budget';
 interface ExpenseListProps {
   expenses: Expense[];
   onDelete: (id: string) => Promise<void>;
+  onEdit?: (expense: Expense) => void;
   isMobile: boolean;
 }
 
 const PAGE_SIZE = 25;
 
-export function ExpenseList({ expenses, onDelete, isMobile }: ExpenseListProps) {
+export function ExpenseList({ expenses, onDelete, onEdit, isMobile }: ExpenseListProps) {
   const [displayCount, setDisplayCount] = useState(PAGE_SIZE);
+  const [expenseToDelete, setExpenseToDelete] = useState<Expense | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleConfirmDelete = async () => {
+    if (!expenseToDelete) return;
+    setIsDeleting(true);
+    try {
+      await onDelete(expenseToDelete.id);
+      setExpenseToDelete(null);
+    } catch (err) {
+      console.error('Failed to delete expense:', err);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   if (expenses.length === 0) {
     return (
@@ -93,7 +110,8 @@ export function ExpenseList({ expenses, onDelete, isMobile }: ExpenseListProps) 
                         variant="light"
                         padding={isMobile ? 'sm' : 'md'}
                         rounded="xl"
-                        className="group"
+                        className="group cursor-pointer hover:bg-white/75 active:scale-[0.99] transition-all"
+                        onClick={() => onEdit?.(expense)}
                       >
                         <div className="flex items-center gap-3">
                           {/* Category Icon */}
@@ -120,13 +138,18 @@ export function ExpenseList({ expenses, onDelete, isMobile }: ExpenseListProps) 
 
                           {/* Delete Button */}
                           <motion.button
+                            type="button"
                             whileTap={{ scale: 0.9 }}
-                            onClick={() => onDelete(expense.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setExpenseToDelete(expense);
+                            }}
                             className={`
                               p-2 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-50
                               transition-all duration-200
                               ${isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}
                             `}
+                            aria-label="Delete transaction"
                           >
                             <Trash2 size={18} />
                           </motion.button>
@@ -152,6 +175,84 @@ export function ExpenseList({ expenses, onDelete, isMobile }: ExpenseListProps) 
           </button>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={Boolean(expenseToDelete)}
+        onClose={() => {
+          if (!isDeleting) setExpenseToDelete(null);
+        }}
+        cardClassName="bg-white/85 border border-white/60 shadow-2xl shadow-neutral-300/40 backdrop-blur-2xl max-w-sm mx-auto"
+      >
+        {expenseToDelete && (() => {
+          const category = getCategoryById(expenseToDelete.category);
+          const CategoryIcon = category.icon;
+          const dateFormatted = format(parseISO(expenseToDelete.expense_date), 'dd MMM yyyy');
+
+          return (
+            <div className="flex flex-col items-center text-center">
+              {/* Warning/Trash Icon */}
+              <div className="w-12 h-12 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center mb-3.5 shadow-inner">
+                <Trash2 size={24} />
+              </div>
+
+              {/* Modal Title & Message */}
+              <h3 className="text-lg font-semibold text-neutral-900 mb-1">
+                Delete Transaction?
+              </h3>
+              <p className="text-sm text-neutral-500 mb-5 leading-relaxed">
+                Are you sure you want to delete this transaction? This action cannot be undone.
+              </p>
+
+              {/* Transaction Summary Card */}
+              <div className="w-full rounded-xl border border-neutral-200/80 bg-neutral-50/80 p-3 mb-6 flex items-center gap-3 text-left">
+                <div className="w-10 h-10 rounded-xl bg-white shadow-xs border border-neutral-100 flex items-center justify-center shrink-0">
+                  <CategoryIcon size={20} className="text-neutral-700" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-neutral-800 truncate">
+                    {expenseToDelete.description || category.name}
+                  </p>
+                  <p className="text-xs text-neutral-500">{dateFormatted}</p>
+                </div>
+                <div className="text-right shrink-0">
+                  <p className="text-sm font-semibold text-red-600">
+                    -{formatIDR(Number(expenseToDelete.amount))}
+                  </p>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center gap-3 w-full">
+                <button
+                  type="button"
+                  onClick={() => setExpenseToDelete(null)}
+                  disabled={isDeleting}
+                  className="flex-1 h-11 rounded-xl border border-neutral-200 bg-white text-sm font-medium text-neutral-700 hover:bg-neutral-50 active:bg-neutral-100 transition-colors disabled:opacity-50 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirmDelete}
+                  disabled={isDeleting}
+                  className="flex-1 h-11 rounded-xl bg-red-600 text-sm font-medium text-white hover:bg-red-700 active:bg-red-800 shadow-sm shadow-red-500/20 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  {isDeleting ? (
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                      className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white"
+                    />
+                  ) : (
+                    'Delete'
+                  )}
+                </button>
+              </div>
+            </div>
+          );
+        })()}
+      </Modal>
     </div>
   );
 }

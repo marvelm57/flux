@@ -11,6 +11,7 @@ import { ExpenseList } from './ExpenseList';
 import { ExpenseChart } from './ExpenseChart';
 import { AddExpenseForm } from './AddExpenseForm';
 import { MonthlyTargetTracker } from './MonthlyTargetTracker';
+import { Expense } from '@/lib/types';
 import { ViewProps } from './types';
 import { formatIDR } from '@/lib/budget';
 
@@ -33,6 +34,7 @@ export function MobileView({
   avgCalcMode,
   setAvgCalcMode,
   addExpense,
+  updateExpense,
   deleteExpense,
   projectionDailyAmount,
   setProjectionDailyAmount,
@@ -41,6 +43,8 @@ export function MobileView({
 }: ViewProps) {
   const router = useRouter();
   const [loggingOut, setLoggingOut] = useState(false);
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   const handleLogout = async () => {
     setLoggingOut(true);
@@ -263,13 +267,35 @@ export function MobileView({
               />
             </div>
           ) : (
-            <ExpenseList expenses={expenses} onDelete={deleteExpense} isMobile={true} />
+            <ExpenseList
+              expenses={expenses}
+              onDelete={deleteExpense}
+              onEdit={(expense) => {
+                setEditingExpense(expense);
+                setIsFormOpen(true);
+              }}
+              isMobile={true}
+            />
           )}
         </motion.div>
       </main>
 
-      {/* Add Expense Button */}
-      <AddExpenseForm onSubmit={addExpense} isMobile={true} />
+      {/* Add / Edit Expense Form */}
+      <AddExpenseForm
+        onSubmit={addExpense}
+        onUpdate={updateExpense}
+        initialExpense={editingExpense}
+        isOpen={isFormOpen}
+        onOpenChange={(open) => {
+          setIsFormOpen(open);
+          if (!open) setEditingExpense(null);
+        }}
+        onAddClick={() => {
+          setEditingExpense(null);
+          setIsFormOpen(true);
+        }}
+        isMobile={true}
+      />
     </div>
   );
 }

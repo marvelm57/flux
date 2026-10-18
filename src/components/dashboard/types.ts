@@ -30,5 +30,6 @@ export interface ViewProps {
   setAvgCalcMode: (mode: AvgCalcMode) => void;
   projectedMonthlyTotal: number;
   addExpense: (expense: ExpenseInsert) => Promise<void>;
+  updateExpense: (id: string, expense: ExpenseInsert) => Promise<void>;
   deleteExpense: (id: string) => Promise<void>;
 }

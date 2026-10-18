@@ -14,6 +14,7 @@ export function BudgetTracker() {
     customDateRange,
     setCustomDateRange,
     addExpense,
+    updateExpense,
     deleteExpense,
     totalExpenses,
     weeklyTotal,
@@ -57,6 +58,7 @@ export function BudgetTracker() {
     projectedMonthlyTotal,
     projectedDays,
     addExpense,
+    updateExpense,
     deleteExpense,
   };
 

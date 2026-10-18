@@ -191,6 +191,57 @@ export function useExpenses() {
     },
   });
 
+  // Update Expense Mutation
+  const updateExpenseMutation = useMutation({
+    mutationFn: async ({ id, ...updates }: { id: string } & ExpenseInsert) => {
+      const { data, error } = await supabase
+        .from('expenses')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (savedExpense) => {
+      if (!savedExpense) return;
+
+      // Update all cached expense queries (Daily, Weekly, Monthly, Custom)
+      const queries = queryClient.getQueriesData<Expense[]>({ queryKey: ['expenses'] });
+      queries.forEach(([queryKey, oldData]) => {
+        if (!oldData) return;
+        const keyArr = queryKey as string[];
+        if (keyArr.length >= 4) {
+          const startStr = keyArr[2];
+          const endStr = keyArr[3];
+
+          const inRange =
+            savedExpense.expense_date >= startStr && savedExpense.expense_date <= endStr;
+
+          if (inRange) {
+            const exists = oldData.some((item) => item.id === savedExpense.id);
+            const updated = exists
+              ? oldData.map((item) => (item.id === savedExpense.id ? savedExpense : item))
+              : [savedExpense, ...oldData];
+            queryClient.setQueryData(
+              queryKey,
+              updated.sort((a, b) => b.expense_date.localeCompare(a.expense_date))
+            );
+          } else {
+            queryClient.setQueryData(
+              queryKey,
+              oldData.filter((item) => item.id !== savedExpense.id)
+            );
+          }
+        }
+      });
+
+      // Invalidate in background for total server sync
+      queryClient.invalidateQueries({ queryKey: ['expenses'] });
+    },
+  });
+
   // Delete Expense Mutation (Optimistic Update)
   const deleteExpenseMutation = useMutation({
     mutationFn: async (id: string) => {
@@ -219,6 +270,13 @@ export function useExpenses() {
       await addExpenseMutation.mutateAsync(expense);
     },
     [addExpenseMutation]
+  );
+
+  const updateExpense = useCallback(
+    async (id: string, expense: ExpenseInsert) => {
+      await updateExpenseMutation.mutateAsync({ id, ...expense });
+    },
+    [updateExpenseMutation]
   );
 
   const deleteExpense = useCallback(
@@ -341,6 +399,7 @@ export function useExpenses() {
     customDateRange,
     setCustomDateRange,
     addExpense,
+    updateExpense,
     deleteExpense,
     totalExpenses,
     weeklyTotal,
