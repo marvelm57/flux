@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar as CalendarIcon, SlidersHorizontal } from 'lucide-react';
-import { format, parseISO } from 'date-fns';
+import { endOfMonth, format, parseISO, startOfMonth, subMonths } from 'date-fns';
 import { BottomSheet, Modal } from '../ui/Overlays';
 import { Calendar } from '../ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
@@ -69,6 +69,15 @@ export function FilterTabs({
     return 'Custom';
   };
 
+  const quickSelectMonths = [4, 3, 2, 1].map((offset) => {
+    const monthDate = subMonths(startOfMonth(new Date()), offset);
+    return {
+      label: format(monthDate, 'MMMM'),
+      start: format(startOfMonth(monthDate), 'yyyy-MM-dd'),
+      end: format(endOfMonth(monthDate), 'yyyy-MM-dd'),
+    };
+  });
+
   const activeIndex = filters.findIndex((f) => f.value === filter);
 
   const formContent = (
@@ -125,27 +134,27 @@ export function FilterTabs({
       <div>
         <label className="mb-2 block text-sm font-medium text-neutral-600">Quick Select</label>
         <div className="grid grid-cols-2 gap-2">
-          {[
-            { label: 'Last 7 Days', days: 7 },
-            { label: 'Last 14 Days', days: 14 },
-            { label: 'Last 30 Days', days: 30 },
-            { label: 'Last 90 Days', days: 90 },
-          ].map((preset) => (
-            <motion.button
-              key={preset.days}
-              onClick={() => {
-                const end = new Date();
-                const start = new Date();
-                start.setDate(end.getDate() - preset.days + 1);
-                setStartDate(format(start, 'yyyy-MM-dd'));
-                setEndDate(format(end, 'yyyy-MM-dd'));
-              }}
-              className="rounded-xl border border-neutral-200 bg-white/50 px-4 py-2.5 text-sm font-medium text-neutral-700 transition-all duration-200 hover:bg-white/80"
-              whileTap={{ scale: 0.95 }}
-            >
-              {preset.label}
-            </motion.button>
-          ))}
+          {quickSelectMonths.map((preset) => {
+            const isSelected = startDate === preset.start && endDate === preset.end;
+            return (
+              <motion.button
+                key={preset.label}
+                type="button"
+                onClick={() => {
+                  setStartDate(preset.start);
+                  setEndDate(preset.end);
+                }}
+                className={`rounded-xl border px-4 py-2.5 text-sm font-medium transition-all duration-200 ${
+                  isSelected
+                    ? 'border-neutral-900 bg-neutral-900 text-white shadow-sm'
+                    : 'border-neutral-200 bg-white/50 text-neutral-700 hover:bg-white/80'
+                }`}
+                whileTap={{ scale: 0.95 }}
+              >
+                {preset.label}
+              </motion.button>
+            );
+          })}
         </div>
       </div>
 
