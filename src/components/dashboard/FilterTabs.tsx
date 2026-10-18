@@ -84,13 +84,13 @@ export function FilterTabs({
     <div className="space-y-5">
       {/* Start Date */}
       <div>
-        <label className="mb-2 block text-sm font-medium text-neutral-600">Start Date</label>
+        <label className="mb-2 block text-sm font-medium text-neutral-600 dark:text-neutral-300">Start Date</label>
         <Popover open={isStartDateOpen} onOpenChange={setIsStartDateOpen}>
-          <PopoverTrigger className="flex w-full items-center gap-3 rounded-xl border border-neutral-200 bg-white/50 px-4 py-3 text-left text-neutral-900 transition-all duration-200 hover:bg-white/70 focus:outline-none focus:ring-2 focus:ring-neutral-900/10">
-            <CalendarIcon size={18} className="shrink-0 text-neutral-400" />
-            <span className="flex-1 text-neutral-900">{format(parseISO(startDate), 'dd/MM/yyyy')}</span>
+          <PopoverTrigger className="flex w-full items-center gap-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white/50 dark:bg-neutral-800/60 px-4 py-3 text-left text-neutral-900 dark:text-white transition-all duration-200 hover:bg-white/70 dark:hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-neutral-900/10">
+            <CalendarIcon size={18} className="shrink-0 text-neutral-400 dark:text-neutral-500" />
+            <span className="flex-1 text-neutral-900 dark:text-white">{format(parseISO(startDate), 'dd/MM/yyyy')}</span>
           </PopoverTrigger>
-          <PopoverContent align="start" sideOffset={10} className="w-auto border border-neutral-200 bg-white p-0 shadow-xl shadow-neutral-200/70">
+          <PopoverContent align="start" sideOffset={10} className="w-auto border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 p-0 shadow-xl shadow-neutral-200/70 dark:shadow-black/60">
             <Calendar
               mode="single"
               selected={parseISO(startDate)}
@@ -108,13 +108,13 @@ export function FilterTabs({
 
       {/* End Date */}
       <div>
-        <label className="mb-2 block text-sm font-medium text-neutral-600">End Date</label>
+        <label className="mb-2 block text-sm font-medium text-neutral-600 dark:text-neutral-300">End Date</label>
         <Popover open={isEndDateOpen} onOpenChange={setIsEndDateOpen}>
-          <PopoverTrigger className="flex w-full items-center gap-3 rounded-xl border border-neutral-200 bg-white/50 px-4 py-3 text-left text-neutral-900 transition-all duration-200 hover:bg-white/70 focus:outline-none focus:ring-2 focus:ring-neutral-900/10">
-            <CalendarIcon size={18} className="shrink-0 text-neutral-400" />
-            <span className="flex-1 text-neutral-900">{format(parseISO(endDate), 'dd/MM/yyyy')}</span>
+          <PopoverTrigger className="flex w-full items-center gap-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white/50 dark:bg-neutral-800/60 px-4 py-3 text-left text-neutral-900 dark:text-white transition-all duration-200 hover:bg-white/70 dark:hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-neutral-900/10">
+            <CalendarIcon size={18} className="shrink-0 text-neutral-400 dark:text-neutral-500" />
+            <span className="flex-1 text-neutral-900 dark:text-white">{format(parseISO(endDate), 'dd/MM/yyyy')}</span>
           </PopoverTrigger>
-          <PopoverContent align="start" sideOffset={10} className="w-auto border border-neutral-200 bg-white p-0 shadow-xl shadow-neutral-200/70">
+          <PopoverContent align="start" sideOffset={10} className="w-auto border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 p-0 shadow-xl shadow-neutral-200/70 dark:shadow-black/60">
             <Calendar
               mode="single"
               selected={parseISO(endDate)}
@@ -132,7 +132,7 @@ export function FilterTabs({
 
       {/* Quick Presets */}
       <div>
-        <label className="mb-2 block text-sm font-medium text-neutral-600">Quick Select</label>
+        <label className="mb-2 block text-sm font-medium text-neutral-600 dark:text-neutral-300">Quick Select</label>
         <div className="grid grid-cols-2 gap-2">
           {quickSelectMonths.map((preset) => {
             const isSelected = startDate === preset.start && endDate === preset.end;
@@ -146,8 +146,8 @@ export function FilterTabs({
                 }}
                 className={`rounded-xl border px-4 py-2.5 text-sm font-medium transition-all duration-200 ${
                   isSelected
-                    ? 'border-neutral-900 bg-neutral-900 text-white shadow-sm'
-                    : 'border-neutral-200 bg-white/50 text-neutral-700 hover:bg-white/80'
+                    ? 'border-neutral-900 bg-neutral-900 text-white dark:border-white dark:bg-white dark:text-neutral-900 shadow-sm'
+                    : 'border-neutral-200 dark:border-neutral-700 bg-white/50 dark:bg-neutral-800/60 text-neutral-700 dark:text-neutral-300 hover:bg-white/80 dark:hover:bg-neutral-700'
                 }`}
                 whileTap={{ scale: 0.95 }}
               >
@@ -163,7 +163,7 @@ export function FilterTabs({
         type="button"
         onClick={handleApplyCustomFilter}
         disabled={!startDate || !endDate}
-        className="mt-4 flex h-12 w-full items-center justify-center rounded-xl bg-neutral-900 px-4 text-base font-medium text-white transition-colors duration-200 hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
+        className="mt-4 flex h-12 w-full items-center justify-center rounded-xl bg-neutral-900 dark:bg-white px-4 text-base font-medium text-white dark:text-neutral-900 transition-colors duration-200 hover:bg-neutral-800 dark:hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
       >
         Apply Filter
       </button>
@@ -202,7 +202,7 @@ export function FilterTabs({
                 relative z-[4] flex min-w-px flex-1 items-center justify-center rounded-[50px]
                 px-2 py-[10px] text-center text-sm font-semibold tracking-[-0.08px]
                 transition-colors duration-200
-                ${filter === f.value ? 'text-dark' : 'text-dark/90'}
+                ${filter === f.value ? 'text-neutral-900 dark:text-white font-bold' : 'text-neutral-700 dark:text-white/80 hover:text-neutral-900 dark:hover:text-white'}
               `}
               whileTap={{ scale: 0.95 }}
             >
@@ -220,7 +220,7 @@ export function FilterTabs({
           isOpen={isOpen}
           onClose={() => setIsOpen(false)}
           title="Custom Date Range"
-          cardClassName="bg-white/60 border border-white/50 shadow-xl shadow-neutral-200/50 backdrop-blur-xl"
+          cardClassName="bg-white/85 dark:bg-neutral-900/90 border border-white/50 dark:border-neutral-800 shadow-xl shadow-neutral-200/50 dark:shadow-black/50 backdrop-blur-xl"
         >
           {formContent}
         </BottomSheet>
@@ -230,7 +230,7 @@ export function FilterTabs({
 
   return (
     <>
-      <div className="relative isolate flex w-[300px] items-center justify-between overflow-hidden rounded-[50px] border-[0.75px] border-white/0 bg-[rgba(255,255,255,0.1)] p-[5px]">
+      <div className="relative isolate flex w-[320px] items-center justify-between overflow-hidden rounded-[50px] border-[0.75px] border-white/0 bg-[rgba(255,255,255,0.1)] dark:bg-white/10 dark:border-white/15 p-[5px]">
         <div
           aria-hidden
           className="pointer-events-none absolute left-[-15.75px] top-[-17.75px] z-[1] h-[81px] w-[344px] bg-[rgba(255,255,255,0.01)] backdrop-blur-[2px]"
@@ -249,7 +249,7 @@ export function FilterTabs({
           transition={{ type: 'spring', damping: 28, stiffness: 320 }}
         >
           <div className="absolute -left-[6px] -top-[5px] h-[45px] w-[106px] bg-[rgba(255,255,255,0.01)] backdrop-blur-[2px] shadow-[inset_0px_-1px_2px_rgba(0,0,0,0.1),inset_0px_0px_2px_rgba(255,255,255,0.2)]" />
-          <div className="absolute inset-0 rounded-[50px] bg-[rgba(255,255,255,0.3)] shadow-[inset_0px_-1px_2px_rgba(0,0,0,0.1),inset_0px_0px_2px_rgba(255,255,255,0.2)]" />
+          <div className="absolute inset-0 rounded-[50px] bg-[rgba(255,255,255,0.3)] dark:bg-white/20 shadow-[inset_0px_-1px_2px_rgba(0,0,0,0.1),inset_0px_0px_2px_rgba(255,255,255,0.2)]" />
         </motion.div>
 
         {filters.map((f) => (
@@ -260,7 +260,7 @@ export function FilterTabs({
               relative z-[4] flex min-w-px flex-1 items-center justify-center rounded-[50px]
               px-2 py-[10px] text-sm font-semibold tracking-[-0.08px]
               transition-colors duration-200
-              ${filter === f.value ? 'text-dark' : 'text-dark/90'}
+              ${filter === f.value ? 'text-neutral-900 dark:text-white font-bold' : 'text-neutral-700 dark:text-white/80 hover:text-neutral-900 dark:hover:text-white'}
             `}
             whileTap={{ scale: 0.97 }}
           >
@@ -278,7 +278,7 @@ export function FilterTabs({
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         title="Custom Date Range"
-        cardClassName="bg-white/60 border border-white/50 shadow-xl shadow-neutral-200/50 backdrop-blur-xl"
+        cardClassName="bg-white/85 dark:bg-neutral-900/90 border border-white/50 dark:border-neutral-800 shadow-xl shadow-neutral-200/50 dark:shadow-black/50 backdrop-blur-xl"
       >
         {formContent}
       </Modal>

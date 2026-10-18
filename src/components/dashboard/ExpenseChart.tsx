@@ -1,6 +1,8 @@
 'use client';
 
+import { useSyncExternalStore } from 'react';
 import { motion } from 'framer-motion';
+import { useTheme } from 'next-themes';
 import {
   AreaChart,
   Area,
@@ -45,8 +47,8 @@ interface ExpenseChartProps {
   isMobile: boolean;
 }
 
-// Monochrome color palette
-const MONOCHROME_COLORS = [
+// Monochrome color palettes
+const LIGHT_COLORS = [
   '#171717',
   '#404040',
   '#525252',
@@ -56,12 +58,34 @@ const MONOCHROME_COLORS = [
   '#e5e5e5',
 ];
 
+const DARK_COLORS = [
+  '#f5f5f5',
+  '#d4d4d4',
+  '#a3a3a3',
+  '#737373',
+  '#525252',
+  '#404040',
+  '#262626',
+];
+
+const emptySubscribe = () => () => {};
+
 export function ExpenseChart({
   expensesByDate,
   expensesByCategory,
   totalExpenses,
   isMobile,
 }: ExpenseChartProps) {
+  const { resolvedTheme } = useTheme();
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
+
+  const isDark = mounted && resolvedTheme === 'dark';
+  const monochromeColors = isDark ? DARK_COLORS : LIGHT_COLORS;
+
   // Prepare data for charts
   const dateData = Object.entries(expensesByDate)
     .map(([date, amount]) => ({ date, amount }))
@@ -85,10 +109,10 @@ export function ExpenseChart({
         transition={{ delay: 0.2 }}
       >
         <GlassCard variant="light" padding="md" rounded="2xl">
-          <h3 className="text-sm font-medium text-neutral-500 mb-4">Spending by Category</h3>
+          <h3 className="text-sm font-semibold text-neutral-800 dark:text-white mb-4">Spending by Category</h3>
           
           {categoryData.length === 0 ? (
-            <p className="text-neutral-400 text-center py-8">No data to display</p>
+            <p className="text-neutral-400 dark:text-neutral-300 text-center py-8">No data to display</p>
           ) : (
             <div className="space-y-3">
               {categoryData.slice(0, 5).map((item, index) => {
@@ -100,20 +124,20 @@ export function ExpenseChart({
                   <div key={item.category}>
                     <div className="flex items-center justify-between mb-1">
                       <div className="flex items-center gap-2">
-                        <CategoryIcon size={14} className="text-neutral-600" />
-                        <span className="text-sm text-neutral-700">{item.name.split(' ')[0]}</span>
+                        <CategoryIcon size={14} className="text-neutral-600 dark:text-white" />
+                        <span className="text-sm font-medium text-neutral-700 dark:text-white">{item.name.split(' ')[0]}</span>
                       </div>
-                      <span className="text-sm font-medium text-neutral-800">
+                      <span className="text-sm font-bold text-neutral-800 dark:text-white">
                         {formatIDRCompact(item.amount)}
                       </span>
                     </div>
-                    <div className="h-2 bg-neutral-200/50 rounded-full overflow-hidden">
+                    <div className="h-2 bg-neutral-200/50 dark:bg-neutral-700/60 rounded-full overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${widthPercentage}%` }}
                         transition={{ duration: 0.5, delay: index * 0.1 }}
                         className="h-full rounded-full"
-                        style={{ backgroundColor: MONOCHROME_COLORS[index % MONOCHROME_COLORS.length] }}
+                        style={{ backgroundColor: monochromeColors[index % monochromeColors.length] }}
                       />
                     </div>
                   </div>
@@ -136,10 +160,10 @@ export function ExpenseChart({
         transition={{ delay: 0.2 }}
       >
         <GlassCard variant="light" padding="lg" rounded="2xl">
-          <h3 className="text-sm font-medium text-neutral-500 mb-4">Spending Over Time</h3>
+          <h3 className="text-sm font-semibold text-neutral-800 dark:text-white mb-4">Spending Over Time</h3>
           
           {dateData.length === 0 ? (
-            <div className="h-48 flex items-center justify-center text-neutral-400">
+            <div className="h-48 flex items-center justify-center text-neutral-400 dark:text-neutral-300">
               No data to display
             </div>
           ) : (
@@ -148,27 +172,27 @@ export function ExpenseChart({
                 <AreaChart data={dateData}>
                   <defs>
                     <linearGradient id="colorAmount" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#171717" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#171717" stopOpacity={0} />
+                      <stop offset="5%" stopColor={isDark ? '#ffffff' : '#171717'} stopOpacity={0.3} />
+                      <stop offset="95%" stopColor={isDark ? '#ffffff' : '#171717'} stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <XAxis
                     dataKey="date"
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fill: '#a3a3a3', fontSize: 11 }}
+                    tick={{ fill: isDark ? '#ffffff' : '#a3a3a3', fontSize: 11 }}
                   />
                   <YAxis
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fill: '#a3a3a3', fontSize: 11 }}
+                    tick={{ fill: isDark ? '#ffffff' : '#a3a3a3', fontSize: 11 }}
                     tickFormatter={(value) => formatIDRCompact(value)}
                   />
                   <Tooltip content={<CustomTooltip />} />
                   <Area
                     type="monotone"
                     dataKey="amount"
-                    stroke="#171717"
+                    stroke={isDark ? '#ffffff' : '#171717'}
                     strokeWidth={2}
                     fill="url(#colorAmount)"
                   />
@@ -186,10 +210,10 @@ export function ExpenseChart({
         transition={{ delay: 0.3 }}
       >
         <GlassCard variant="light" padding="lg" rounded="2xl">
-          <h3 className="text-sm font-medium text-neutral-500 mb-4">Category Breakdown</h3>
+          <h3 className="text-sm font-semibold text-neutral-800 dark:text-white mb-4">Category Breakdown</h3>
           
           {categoryData.length === 0 ? (
-            <div className="h-48 flex items-center justify-center text-neutral-400">
+            <div className="h-48 flex items-center justify-center text-neutral-400 dark:text-neutral-300">
               No data to display
             </div>
           ) : (
@@ -209,7 +233,7 @@ export function ExpenseChart({
                       {categoryData.map((entry, index) => (
                         <Cell
                           key={entry.category}
-                          fill={MONOCHROME_COLORS[index % MONOCHROME_COLORS.length]}
+                          fill={monochromeColors[index % monochromeColors.length]}
                         />
                       ))}
                     </Pie>
@@ -221,12 +245,12 @@ export function ExpenseChart({
                   <div key={item.category} className="flex items-center gap-2">
                     <div
                       className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: MONOCHROME_COLORS[index % MONOCHROME_COLORS.length] }}
+                      style={{ backgroundColor: monochromeColors[index % monochromeColors.length] }}
                     />
-                    <span className="text-sm text-neutral-600 flex-1 truncate">
+                    <span className="text-sm font-medium text-neutral-600 dark:text-white flex-1 truncate">
                       {item.name}
                     </span>
-                    <span className="text-sm font-medium text-neutral-800">
+                    <span className="text-sm font-bold text-neutral-800 dark:text-white">
                       {item.percentage}%
                     </span>
                   </div>

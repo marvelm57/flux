@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { Wallet, TrendingDown, Receipt, PieChart, AlertTriangle, LogOut, Calculator } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { GlassCard } from '../ui/GlassComponents';
+import { ThemeToggle } from '../ui/ThemeToggle';
 import { FilterTabs } from './FilterTabs';
 import { ExpenseList, filterExpenses } from './ExpenseList';
 import { ExpenseToolbar } from './ExpenseToolbar';
@@ -121,7 +122,7 @@ export function DesktopView({
     : [totalSpendingCard, ...otherStatsCards];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-100 via-neutral-50 to-neutral-200">
+    <div className="min-h-screen bg-gradient-to-br from-neutral-100 via-neutral-50 to-neutral-200 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-8 py-8">
         {/* Header */}
         <motion.header
@@ -134,12 +135,12 @@ export function DesktopView({
               <Wallet size={24} className="text-white" />
             </GlassCard>
             <div>
-              <h1 className="text-3xl font-bold text-neutral-900">Flux</h1>
-              <p className="text-neutral-500">Track your expenses with ease</p>
+              <h1 className="text-3xl font-bold text-neutral-900 dark:text-white">Flux</h1>
+              <p className="text-neutral-500 dark:text-neutral-400">Track your expenses with ease</p>
             </div>
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <FilterTabs 
               filter={filter} 
               setFilter={setFilter} 
@@ -148,6 +149,8 @@ export function DesktopView({
               onCustomDateChange={setCustomDateRange}
             />
             
+            <ThemeToggle size={22} />
+
             <motion.button
               whileTap={{ scale: 0.9 }}
               whileHover={{ scale: 1.08 }}
@@ -233,31 +236,39 @@ export function DesktopView({
                 variant={stat.isDark ? 'dark' : 'light'}
                 padding="lg"
                 rounded="2xl"
-                className={`h-full flex flex-col justify-between ${stat.isDark ? 'bg-neutral-900 text-white' : ''}`}
+                className={`h-full flex flex-col justify-between ${
+                  stat.isDark 
+                    ? 'bg-neutral-900 text-white' 
+                    : 'dark:bg-neutral-900/80 dark:border-white/10 text-neutral-900 dark:text-white'
+                }`}
               >
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className={`text-xs font-medium mb-1 ${stat.isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
+                    <p className={`text-xs font-medium mb-1 ${
+                      stat.isDark 
+                        ? 'text-neutral-400' 
+                        : 'text-neutral-500 dark:text-neutral-200'
+                    }`}>
                       {index === 0 ? filterLabels[filter] + ' ' : ''}{stat.title}
                     </p>
                     <motion.h2
                       key={stat.value}
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      className={`text-3xl font-bold ${stat.isDark ? 'text-white' : 'text-neutral-900'}`}
+                      className={`text-3xl font-bold ${stat.isDark ? 'text-white' : 'text-neutral-900 dark:text-white'}`}
                     >
                       {stat.value}
                     </motion.h2>
                   </div>
-                  <div className={`p-3 rounded-xl ${stat.isDark ? 'bg-white/10' : 'bg-neutral-900/10'}`}>
-                    <stat.icon size={20} className={stat.isDark ? 'text-white' : 'text-neutral-700'} />
+                  <div className={`p-3 rounded-xl ${stat.isDark ? 'bg-white/10' : 'bg-neutral-900/10 dark:bg-white/10'}`}>
+                    <stat.icon size={20} className={stat.isDark ? 'text-white' : 'text-neutral-700 dark:text-white'} />
                   </div>
                 </div>
 
-                <div className={`mt-3 pt-2 border-t ${stat.isDark ? 'border-white/10' : 'border-neutral-200/60'} flex items-center h-6 gap-1 text-xs`}>
+                <div className={`mt-3 pt-2 border-t ${stat.isDark ? 'border-white/10' : 'border-neutral-200/60 dark:border-white/10'} flex items-center h-6 gap-1 text-xs`}>
                   {stat.isAvgCard && (
                     <>
-                      <span className={`${stat.isDark ? 'text-neutral-400' : 'text-neutral-500'} font-medium text-xs mr-1`}>Mode:</span>
+                      <span className={`${stat.isDark ? 'text-neutral-400' : 'text-neutral-500 dark:text-neutral-200'} font-medium text-xs mr-1`}>Mode:</span>
                       {(['all', 'workdays', 'active'] as const).map((mode) => (
                         <button
                           key={mode}
@@ -267,10 +278,10 @@ export function DesktopView({
                             avgCalcMode === mode
                               ? stat.isDark
                                 ? 'bg-white text-neutral-900 shadow-xs'
-                                : 'bg-neutral-900 text-white shadow-xs'
+                                : 'bg-neutral-900 text-white shadow-xs dark:bg-white dark:text-neutral-900'
                               : stat.isDark
                                 ? 'bg-white/10 text-neutral-300 hover:bg-white/20'
-                                : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
+                                : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200 dark:bg-white/10 dark:text-neutral-200 dark:hover:bg-white/20'
                           }`}
                         >
                           {mode === 'all' ? 'All Days' : mode === 'workdays' ? 'Workdays' : 'Active Days'}
@@ -322,8 +333,8 @@ export function DesktopView({
         >
           <GlassCard variant="light" padding="lg" rounded="2xl">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-neutral-800">Recent Transactions</h3>
-              <span className="text-sm text-neutral-500">
+              <h3 className="text-lg font-semibold text-neutral-800 dark:text-white">Recent Transactions</h3>
+              <span className="text-sm text-neutral-500 dark:text-neutral-200 font-medium">
                 {filteredExpenses.length} {filteredExpenses.length === 1 ? 'item' : 'items'}
               </span>
             </div>

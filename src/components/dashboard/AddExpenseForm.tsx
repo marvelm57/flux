@@ -137,9 +137,9 @@ export function AddExpenseForm({
     <div className="space-y-5">
       {/* Amount Input */}
       <div>
-        <label className="mb-2 block text-sm font-medium text-neutral-600">Amount (IDR)</label>
+        <label className="mb-2 block text-sm font-medium text-neutral-600 dark:text-neutral-300">Amount (IDR)</label>
         <div className="relative">
-          <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400">
+          <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-neutral-500">
             <RupiahIcon size={18} />
           </div>
           <input
@@ -148,14 +148,14 @@ export function AddExpenseForm({
             placeholder="0"
             value={amount}
             onChange={(e) => setAmount(formatWithThousandSeparator(e.target.value))}
-            className="w-full rounded-xl border border-neutral-200 bg-white/50 py-3 pl-12 pr-4 text-2xl font-semibold text-neutral-900 placeholder:text-neutral-400 transition-all duration-200 focus:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
+            className="w-full rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white/50 dark:bg-neutral-800/60 py-3 pl-12 pr-4 text-2xl font-semibold text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 transition-all duration-200 focus:border-neutral-400 dark:focus:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
           />
         </div>
         
         {/* Quick Presets - only show when creating new expense */}
         {!isEditing && (
           <div className="mt-3">
-            <span className="text-xs font-medium text-neutral-400 block mb-1.5">Quick Add:</span>
+            <span className="text-xs font-medium text-neutral-400 dark:text-neutral-400 block mb-1.5">Quick Add:</span>
             <div className="flex flex-wrap items-center gap-2">
               {quickPresets.map((preset, idx) => {
                 const isSelected = 
@@ -170,8 +170,8 @@ export function AddExpenseForm({
                     onClick={() => handlePresetClick(preset)}
                     className={`shrink-0 px-2.5 py-1 rounded-full text-xs font-medium transition-colors border ${
                       isSelected 
-                        ? 'bg-neutral-900 text-white border-neutral-900 shadow-sm' 
-                        : 'bg-neutral-100/80 hover:bg-neutral-200/80 text-neutral-600 border-neutral-200/60'
+                        ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 border-neutral-900 dark:border-white shadow-sm' 
+                        : 'bg-neutral-100/80 hover:bg-neutral-200/80 dark:bg-neutral-800/80 dark:hover:bg-neutral-700/80 text-neutral-600 dark:text-neutral-300 border-neutral-200/60 dark:border-neutral-700/60'
                     }`}
                   >
                     {preset.description}
@@ -185,7 +185,7 @@ export function AddExpenseForm({
 
       {/* Category Selection */}
       <div>
-        <label className="mb-2 block text-sm font-medium text-neutral-600">Category</label>
+        <label className="mb-2 block text-sm font-medium text-neutral-600 dark:text-neutral-300">Category</label>
         <div className={`grid gap-2 ${isMobile ? 'grid-cols-4' : 'grid-cols-6'}`}>
           {categories.map((category) => (
             <motion.button
@@ -196,8 +196,8 @@ export function AddExpenseForm({
                 transition-all duration-200
                 ${
                   selectedCategory.id === category.id
-                    ? 'border-neutral-900/85 bg-neutral-900 text-white shadow-[inset_0px_-1px_2px_rgba(0,0,0,0.35),inset_0px_1px_2px_rgba(255,255,255,0.08)]'
-                    : 'border-white/80 bg-white/55 text-neutral-700 shadow-[inset_0px_-1px_2px_rgba(0,0,0,0.08),inset_0px_1px_2px_rgba(255,255,255,0.8)] hover:bg-white/75'
+                    ? 'border-neutral-900/85 dark:border-white/90 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 shadow-[inset_0px_-1px_2px_rgba(0,0,0,0.35),inset_0px_1px_2px_rgba(255,255,255,0.08)]'
+                    : 'border-white/80 dark:border-white/10 bg-white/55 dark:bg-neutral-800/60 text-neutral-700 dark:text-neutral-300 shadow-[inset_0px_-1px_2px_rgba(0,0,0,0.08),inset_0px_1px_2px_rgba(255,255,255,0.8)] hover:bg-white/75 dark:hover:bg-neutral-800'
                 }
               `}
               whileTap={{ scale: 0.95 }}
@@ -211,16 +211,16 @@ export function AddExpenseForm({
 
       {/* Date Selection */}
       <div>
-        <label className="mb-2 block text-sm font-medium text-neutral-600">Date</label>
+        <label className="mb-2 block text-sm font-medium text-neutral-600 dark:text-neutral-300">Date</label>
         <Popover open={isDateOpen} onOpenChange={setIsDateOpen}>
-          <PopoverTrigger className="flex w-full items-center gap-3 rounded-xl border border-neutral-200 bg-white/50 px-4 py-3 text-left text-neutral-900 transition-all duration-200 hover:bg-white/70 focus:outline-none focus:ring-2 focus:ring-neutral-900/10">
-            <CalendarIcon size={18} className="shrink-0 text-neutral-400" />
-            <span className="flex-1 text-neutral-900">{format(parseISO(expenseDate), 'dd/MM/yyyy')}</span>
+          <PopoverTrigger className="flex w-full items-center gap-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white/50 dark:bg-neutral-800/60 px-4 py-3 text-left text-neutral-900 dark:text-white transition-all duration-200 hover:bg-white/70 dark:hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-neutral-900/10">
+            <CalendarIcon size={18} className="shrink-0 text-neutral-400 dark:text-neutral-500" />
+            <span className="flex-1 text-neutral-900 dark:text-white">{format(parseISO(expenseDate), 'dd/MM/yyyy')}</span>
           </PopoverTrigger>
           <PopoverContent
             align="start"
             sideOffset={10}
-            className="w-auto border border-neutral-200 bg-white p-0 shadow-xl shadow-neutral-200/70"
+            className="w-auto border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 p-0 shadow-xl shadow-neutral-200/70 dark:shadow-black/60"
           >
             <Calendar
               mode="single"
@@ -239,9 +239,9 @@ export function AddExpenseForm({
 
       {/* Description */}
       <div>
-        <label className="mb-2 block text-sm font-medium text-neutral-600">Description (Optional)</label>
+        <label className="mb-2 block text-sm font-medium text-neutral-600 dark:text-neutral-300">Description (Optional)</label>
         <div className="relative">
-          <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400">
+          <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-neutral-500">
             <FileText size={18} />
           </div>
           <input
@@ -249,7 +249,7 @@ export function AddExpenseForm({
             placeholder="Add a note..."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-full rounded-xl border border-neutral-200 bg-white/50 py-3 pl-12 pr-4 text-neutral-900 placeholder:text-neutral-400 transition-all duration-200 focus:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
+            className="w-full rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white/50 dark:bg-neutral-800/60 py-3 pl-12 pr-4 text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 transition-all duration-200 focus:border-neutral-400 dark:focus:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
           />
         </div>
       </div>
@@ -259,13 +259,13 @@ export function AddExpenseForm({
         type="button"
         onClick={handleSubmit}
         disabled={!amount || parseFormattedNumber(amount) <= 0 || isSubmitting}
-        className="mt-4 flex h-12 w-full items-center justify-center rounded-xl bg-neutral-900 px-4 text-base font-medium text-white transition-colors duration-200 hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
+        className="mt-4 flex h-12 w-full items-center justify-center rounded-xl bg-neutral-900 dark:bg-white px-4 text-base font-medium text-white dark:text-neutral-900 transition-colors duration-200 hover:bg-neutral-800 dark:hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
       >
         {isSubmitting ? (
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-            className="h-5 w-5 rounded-full border-2 border-white/30 border-t-white"
+            className="h-5 w-5 rounded-full border-2 border-white/30 dark:border-neutral-900/30 border-t-white dark:border-t-neutral-900"
           />
         ) : (
           isEditing ? 'Save Changes' : 'Add Expense'
@@ -296,7 +296,7 @@ export function AddExpenseForm({
             }
           }}
           className={`
-            flex items-center justify-center rounded-full bg-neutral-900 text-white shadow-lg shadow-neutral-900/20 transition-colors duration-200 hover:bg-neutral-800
+            flex items-center justify-center rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 shadow-lg shadow-neutral-900/20 dark:shadow-black/50 transition-colors duration-200 hover:bg-neutral-800 dark:hover:bg-neutral-100 cursor-pointer
             ${isMobile ? 'h-14 w-14' : 'h-16 w-16'}
           `}
           aria-label="Add expense"
@@ -311,7 +311,7 @@ export function AddExpenseForm({
           isOpen={isOpen}
           onClose={handleClose}
           title={isEditing ? 'Edit Expense' : 'Add Expense'}
-          cardClassName="bg-white/60 border border-white/50 shadow-xl shadow-neutral-200/50 backdrop-blur-xl"
+          cardClassName="bg-white/85 dark:bg-neutral-900/90 border border-white/50 dark:border-neutral-800 shadow-xl shadow-neutral-200/50 dark:shadow-black/50 backdrop-blur-xl"
         >
           {formContent}
         </BottomSheet>
@@ -320,7 +320,7 @@ export function AddExpenseForm({
           isOpen={isOpen}
           onClose={handleClose}
           title={isEditing ? 'Edit Expense' : 'Add Expense'}
-          cardClassName="bg-white/60 border border-white/50 shadow-xl shadow-neutral-200/50 backdrop-blur-xl"
+          cardClassName="bg-white/85 dark:bg-neutral-900/90 border border-white/50 dark:border-neutral-800 shadow-xl shadow-neutral-200/50 dark:shadow-black/50 backdrop-blur-xl"
         >
           {formContent}
         </Modal>

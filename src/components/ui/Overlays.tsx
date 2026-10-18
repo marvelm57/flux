@@ -74,17 +74,17 @@ export function BottomSheet({
             >
               {/* Handle */}
               <div className="flex justify-center pt-3 pb-2">
-                <div className="h-1 w-10 rounded-full bg-neutral-300" />
+                <div className="h-1 w-10 rounded-full bg-neutral-300 dark:bg-neutral-600" />
               </div>
 
               {/* Header */}
               {title && (
-                <div className={`flex items-center justify-between border-b border-neutral-200 px-5 pb-4 ${headerClassName}`}>
-                  <h2 className="text-lg font-semibold text-neutral-900">{title}</h2>
+                <div className={`flex items-center justify-between border-b border-neutral-200 dark:border-neutral-800 px-5 pb-4 ${headerClassName}`}>
+                  <h2 className="text-lg font-semibold text-neutral-900 dark:text-white">{title}</h2>
                   <button
                     type="button"
                     onClick={onClose}
-                    className={`flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-700 shadow-sm transition-colors hover:bg-neutral-100 ${closeButtonClassName}`}
+                    className={`flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 shadow-sm transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-700 ${closeButtonClassName}`}
                   >
                     <X size={20} />
                   </button>
@@ -160,12 +160,12 @@ export function Modal({
             >
               <GlassCard variant="light" blur="xl" padding="none" rounded="2xl" className={cardClassName}>
                 {title && (
-                  <div className={`flex items-center justify-between px-6 py-4 border-b border-neutral-200 ${headerClassName}`}>
-                    <h2 className="text-lg font-semibold text-neutral-900">{title}</h2>
+                  <div className={`flex items-center justify-between px-6 py-4 border-b border-neutral-200 dark:border-neutral-800 ${headerClassName}`}>
+                    <h2 className="text-lg font-semibold text-neutral-900 dark:text-white">{title}</h2>
                     <button
                       type="button"
                       onClick={onClose}
-                      className={`flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-700 shadow-sm transition-colors hover:bg-neutral-100 ${closeButtonClassName}`}
+                      className={`flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 shadow-sm transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-700 ${closeButtonClassName}`}
                     >
                       <X size={20} />
                     </button>

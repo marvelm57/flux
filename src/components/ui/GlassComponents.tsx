@@ -39,13 +39,13 @@ const roundedClasses = {
 
 const variantClasses = {
   default:
-    'bg-[rgba(255,255,255,0.08)] border-[0.75px] border-white/10 text-white shadow-[inset_0px_-2px_4px_rgba(0,0,0,0.2),inset_0px_2px_4px_rgba(255,255,255,0.4)]',
+    'bg-[rgba(255,255,255,0.08)] dark:bg-[rgba(255,255,255,0.05)] border-[0.75px] border-white/10 dark:border-white/10 text-white shadow-[inset_0px_-2px_4px_rgba(0,0,0,0.2),inset_0px_2px_4px_rgba(255,255,255,0.4)] dark:shadow-[inset_0px_1px_2px_rgba(255,255,255,0.1)]',
   light:
-    'bg-[rgba(255,255,255,0.12)] border-[0.75px] border-white/20 text-white shadow-[inset_0px_-1px_3px_rgba(0,0,0,0.15),inset_0px_2px_4px_rgba(255,255,255,0.45)]',
+    'bg-[rgba(255,255,255,0.12)] dark:bg-[rgba(255,255,255,0.07)] border-[0.75px] border-white/20 dark:border-white/10 text-white shadow-[inset_0px_-1px_3px_rgba(0,0,0,0.15),inset_0px_2px_4px_rgba(255,255,255,0.45)] dark:shadow-[inset_0px_1px_2px_rgba(255,255,255,0.1)]',
   dark:
-    'bg-[rgba(34,34,34,0.52)] border-[0.75px] border-white/15 text-white shadow-[inset_0px_-2px_5px_rgba(0,0,0,0.35),inset_0px_1px_3px_rgba(255,255,255,0.18)]',
+    'bg-[rgba(34,34,34,0.52)] dark:bg-[rgba(24,24,27,0.7)] border-[0.75px] border-white/15 dark:border-white/10 text-white shadow-[inset_0px_-2px_5px_rgba(0,0,0,0.35),inset_0px_1px_3px_rgba(255,255,255,0.18)]',
   frosted:
-    'bg-[rgba(255,255,255,0.06)] border-[0.75px] border-white/8 text-white shadow-[inset_0px_-2px_4px_rgba(0,0,0,0.2),inset_0px_2px_5px_rgba(255,255,255,0.32)]',
+    'bg-[rgba(255,255,255,0.06)] dark:bg-[rgba(255,255,255,0.04)] border-[0.75px] border-white/8 dark:border-white/10 text-white shadow-[inset_0px_-2px_4px_rgba(0,0,0,0.2),inset_0px_2px_5px_rgba(255,255,255,0.32)]',
 };
 
 const textureClasses = {

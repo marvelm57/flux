@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { TrendingDown, CalendarDays, AlertTriangle, LogOut } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { GlassCard } from '../ui/GlassComponents';
+import { ThemeToggle } from '../ui/ThemeToggle';
 import { FilterTabs } from './FilterTabs';
 import { ExpenseList } from './ExpenseList';
 import { ExpenseChart } from './ExpenseChart';
@@ -63,7 +64,7 @@ export function MobileView({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-100 via-neutral-50 to-neutral-200">
+    <div className="min-h-screen bg-gradient-to-br from-neutral-100 via-neutral-50 to-neutral-200 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950 transition-colors duration-300">
       {/* Status Bar Spacer */}
       <div className="h-12" />
 
@@ -75,20 +76,23 @@ export function MobileView({
       >
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-neutral-900">Flux</h1>
-            <p className="text-sm text-neutral-500">Budget Tracker</p>
+            <h1 className="text-2xl font-bold text-neutral-900 dark:text-white">Flux</h1>
+            <p className="text-sm text-neutral-500 dark:text-neutral-400">Budget Tracker</p>
           </div>
-          <motion.button
-            whileTap={{ scale: 0.9 }}
-            whileHover={{ scale: 1.08 }}
-            onClick={() => setShowLogoutModal(true)}
-            disabled={loggingOut}
-            className="text-neutral-400 hover:text-red-500 transition-colors p-1.5 flex items-center justify-center cursor-pointer disabled:opacity-50"
-            title="Log out"
-            aria-label="Log out"
-          >
-            <LogOut size={24} />
-          </motion.button>
+          <div className="flex items-center gap-2">
+            <ThemeToggle size={22} />
+            <motion.button
+              whileTap={{ scale: 0.9 }}
+              whileHover={{ scale: 1.08 }}
+              onClick={() => setShowLogoutModal(true)}
+              disabled={loggingOut}
+              className="text-neutral-400 hover:text-red-500 transition-colors p-1.5 flex items-center justify-center cursor-pointer disabled:opacity-50"
+              title="Log out"
+              aria-label="Log out"
+            >
+              <LogOut size={24} />
+            </motion.button>
+          </div>
         </div>
 
         {/* Total Spending Card */}
@@ -262,7 +266,7 @@ export function MobileView({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
         >
-          <h3 className="text-sm font-medium text-neutral-500 mb-3 px-1">Recent Transactions</h3>
+          <h3 className="text-sm font-bold text-neutral-800 dark:text-white mb-3 px-1">Recent Transactions</h3>
           {loading ? (
             <div className="flex justify-center py-12">
               <motion.div

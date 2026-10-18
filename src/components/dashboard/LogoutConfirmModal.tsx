@@ -23,17 +23,17 @@ export function LogoutConfirmModal({
       onClose={() => {
         if (!isLoading) onClose();
       }}
-      cardClassName="bg-white/85 border border-white/60 shadow-2xl shadow-neutral-300/40 backdrop-blur-2xl max-w-sm mx-auto"
+      cardClassName="bg-white/85 dark:bg-neutral-900/90 border border-white/60 dark:border-neutral-800 shadow-2xl shadow-neutral-300/40 dark:shadow-black/50 backdrop-blur-2xl max-w-sm mx-auto"
     >
       <div className="flex flex-col items-center text-center">
         {/* Warning / Logout Icon */}
-        <div className="w-12 h-12 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center mb-3.5 shadow-inner">
+        <div className="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-950/50 text-red-600 dark:text-red-400 flex items-center justify-center mb-3.5 shadow-inner">
           <LogOut size={24} />
         </div>
 
         {/* Title & Message */}
-        <h3 className="text-lg font-semibold text-neutral-900 mb-1">Log Out?</h3>
-        <p className="text-sm text-neutral-500 mb-6 leading-relaxed">
+        <h3 className="text-lg font-semibold text-neutral-900 dark:text-white mb-1">Log Out?</h3>
+        <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-6 leading-relaxed">
           Are you sure you want to log out of Flux?
         </p>
 
@@ -43,7 +43,7 @@ export function LogoutConfirmModal({
             type="button"
             onClick={onClose}
             disabled={isLoading}
-            className="flex-1 h-11 rounded-xl border border-neutral-200 bg-white text-sm font-medium text-neutral-700 hover:bg-neutral-50 active:bg-neutral-100 transition-colors disabled:opacity-50 cursor-pointer"
+            className="flex-1 h-11 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm font-medium text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-700 active:bg-neutral-100 transition-colors disabled:opacity-50 cursor-pointer"
           >
             Cancel
           </button>
