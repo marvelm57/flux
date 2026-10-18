@@ -11,6 +11,7 @@ import { ExpenseList } from './ExpenseList';
 import { ExpenseChart } from './ExpenseChart';
 import { AddExpenseForm } from './AddExpenseForm';
 import { MonthlyTargetTracker } from './MonthlyTargetTracker';
+import { LogoutConfirmModal } from './LogoutConfirmModal';
 import { Expense } from '@/lib/types';
 import { ViewProps } from './types';
 import { formatIDR } from '@/lib/budget';
@@ -43,6 +44,7 @@ export function MobileView({
 }: ViewProps) {
   const router = useRouter();
   const [loggingOut, setLoggingOut] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
 
@@ -76,14 +78,17 @@ export function MobileView({
             <h1 className="text-2xl font-bold text-neutral-900">Flux</h1>
             <p className="text-sm text-neutral-500">Budget Tracker</p>
           </div>
-          <button
-            onClick={handleLogout}
+          <motion.button
+            whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.08 }}
+            onClick={() => setShowLogoutModal(true)}
             disabled={loggingOut}
-            className="flex items-center gap-2 px-3 py-2 rounded-full bg-white/40 backdrop-blur-sm border border-white/20 text-neutral-700 hover:bg-white/60 transition-all disabled:opacity-50"
+            className="text-neutral-400 hover:text-red-500 transition-colors p-1.5 flex items-center justify-center cursor-pointer disabled:opacity-50"
+            title="Log out"
+            aria-label="Log out"
           >
-            <LogOut size={18} />
-            <span className="text-xs font-medium">{loggingOut ? '...' : 'Logout'}</span>
-          </button>
+            <LogOut size={24} />
+          </motion.button>
         </div>
 
         {/* Total Spending Card */}
@@ -295,6 +300,14 @@ export function MobileView({
           setIsFormOpen(true);
         }}
         isMobile={true}
+      />
+
+      {/* Logout Confirmation Modal */}
+      <LogoutConfirmModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={handleLogout}
+        isLoading={loggingOut}
       />
     </div>
   );

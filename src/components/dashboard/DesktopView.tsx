@@ -11,6 +11,7 @@ import { ExpenseList } from './ExpenseList';
 import { ExpenseChart } from './ExpenseChart';
 import { AddExpenseForm } from './AddExpenseForm';
 import { MonthlyTargetTracker } from './MonthlyTargetTracker';
+import { LogoutConfirmModal } from './LogoutConfirmModal';
 import { Expense } from '@/lib/types';
 import { ViewProps } from './types';
 import { formatIDR } from '@/lib/budget';
@@ -42,6 +43,7 @@ export function DesktopView({
 }: ViewProps) {
   const router = useRouter();
   const [loggingOut, setLoggingOut] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
 
@@ -135,14 +137,17 @@ export function DesktopView({
               onCustomDateChange={setCustomDateRange}
             />
             
-            <button
-              onClick={handleLogout}
+            <motion.button
+              whileTap={{ scale: 0.9 }}
+              whileHover={{ scale: 1.08 }}
+              onClick={() => setShowLogoutModal(true)}
               disabled={loggingOut}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/40 backdrop-blur-sm border border-white/20 text-neutral-700 hover:text-red-500 hover:bg-red-50 transition-all duration-200 disabled:opacity-50"
+              className="text-neutral-400 hover:text-red-500 transition-colors p-1.5 flex items-center justify-center cursor-pointer disabled:opacity-50"
+              title="Log out"
+              aria-label="Log out"
             >
-              <LogOut size={18} />
-              <span className="text-sm font-medium">{loggingOut ? 'Logging out...' : 'Logout'}</span>
-            </button>
+              <LogOut size={24} />
+            </motion.button>
           </div>
         </motion.header>
 
@@ -333,6 +338,14 @@ export function DesktopView({
           setIsFormOpen(true);
         }}
         isMobile={false}
+      />
+
+      {/* Logout Confirmation Modal */}
+      <LogoutConfirmModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={handleLogout}
+        isLoading={loggingOut}
       />
     </div>
   );
